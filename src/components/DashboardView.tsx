@@ -463,31 +463,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-cyan-500/50 text-[10px] font-mono">%</span>
             </div>
           </div>
-          <button
-            onClick={() => {
-              const val = parseInt(inflationInput);
-              if (val > 0 && val <= 10000) {
-                onApplyInflation(val);
-                setInflationInput('');
-              }
-            }}
-            disabled={!inflationInput || parseInt(inflationInput) <= 0}
-            className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 hover:border-amber-400 px-3 py-1.5 rounded-lg font-display font-bold text-[10px] uppercase tracking-widest cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover-bounce"
-          >
-            Terapkan
-          </button>
-        </div>
-        <div className="mt-2 flex gap-1.5 flex-wrap">
-          {[10, 50, 100, 200, 300].map((pct) => (
             <button
-              key={pct}
-              onClick={() => onApplyInflation(pct)}
-              className="px-2 py-1 bg-slate-900/60 hover:bg-cyan-950/40 border border-cyan-950/40 hover:border-cyan-500/30 rounded text-[9px] font-mono text-slate-400 hover:text-cyan-400 cursor-pointer transition-all"
+              onClick={() => {
+                const val = parseInt(inflationInput);
+                if (val >= 0 && val <= 10000) {
+                  onApplyInflation(val);
+                  setInflationInput('');
+                }
+              }}
+              disabled={!inflationInput || parseInt(inflationInput) < 0}
+              className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 hover:border-amber-400 px-3 py-1.5 rounded-lg font-display font-bold text-[10px] uppercase tracking-widest cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover-bounce"
             >
-              +{pct}%
+              Terapkan
             </button>
-          ))}
-        </div>
+          </div>
+          <div className="mt-2 flex gap-1.5 flex-wrap">
+            {[0, 10, 50, 100, 200, 300].map((pct) => (
+              <button
+                key={pct}
+                onClick={() => onApplyInflation(pct)}
+                className={`px-2 py-1 rounded text-[9px] font-mono transition-all cursor-pointer ${
+                  pct === 0
+                    ? 'bg-red-950/40 hover:bg-red-900/40 border border-red-500/30 text-red-400 hover:text-red-300'
+                    : 'bg-slate-900/60 hover:bg-cyan-950/40 border border-cyan-950/40 hover:border-cyan-500/30 text-slate-400 hover:text-cyan-400'
+                }`}
+              >
+                {pct === 0 ? 'RESET BASE' : `+${pct}%`}
+              </button>
+            ))}
+          </div>
       </div>
 
       {/* Add Button */}
