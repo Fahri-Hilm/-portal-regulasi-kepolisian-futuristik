@@ -4,9 +4,10 @@ import { useAdaptivePerformance } from '../contexts/AdaptivePerformanceContext';
 interface VideoBackgroundProps {
   src: string;
   fallbackColor?: string;
+  disabled?: boolean;
 }
 
-export function VideoBackground({ src, fallbackColor = '#0a0a0a' }: VideoBackgroundProps) {
+export function VideoBackground({ src, fallbackColor = '#000000', disabled = false }: VideoBackgroundProps) {
   const { config, tier, isLowEnd } = useAdaptivePerformance();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -25,7 +26,7 @@ export function VideoBackground({ src, fallbackColor = '#0a0a0a' }: VideoBackgro
   };
 
   const videoSource = getVideoSource();
-  const shouldLoadVideo = videoSource !== null && config.enableVideoBackground;
+  const shouldLoadVideo = videoSource !== null && config.enableVideoBackground && !disabled;
 
   useEffect(() => {
     if (!shouldLoadVideo) {

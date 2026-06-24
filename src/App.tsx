@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense, lazy, memo } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy, memo, useMemo } from 'react';
 import { Regulation, IncidentReport } from './types';
 import { INITIAL_REGULATIONS, INITIAL_REPORTS } from './data';
 import { Logo } from './components/Logo';
@@ -34,10 +34,29 @@ const ClockDisplay = memo(function ClockDisplay() {
   );
 });
 
-const RegulationView = lazy(() => import('./components/RegulationView').then(m => ({ default: m.RegulationView })));
-const DashboardView = lazy(() => import('./components/DashboardView').then(m => ({ default: m.DashboardView })));
-const ReportView = lazy(() => import('./components/ReportView').then(m => ({ default: m.ReportView })));
-const DocumentationView = lazy(() => import('./components/DocumentationView').then(m => ({ default: m.DocumentationView })));
+const lazyWithRetry = (componentImport: () => Promise<any>, exportName: string) => {
+  return lazy(async () => {
+    const retryKey = `pkr_retry_${exportName}`;
+    const hasRetried = window.sessionStorage.getItem(retryKey);
+    try {
+      const module = await componentImport();
+      window.sessionStorage.removeItem(retryKey);
+      return { default: module[exportName] };
+    } catch (error) {
+      if (!hasRetried) {
+        window.sessionStorage.setItem(retryKey, 'true');
+        console.warn(`[SPA] Chunk load failed for ${exportName}, reloading page to fetch latest version...`, error);
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+};
+
+const RegulationView = lazyWithRetry(() => import('./components/RegulationView'), 'RegulationView');
+const DashboardView = lazyWithRetry(() => import('./components/DashboardView'), 'DashboardView');
+const ReportView = lazyWithRetry(() => import('./components/ReportView'), 'ReportView');
+const DocumentationView = lazyWithRetry(() => import('./components/DocumentationView'), 'DocumentationView');
 
 import {
   LayoutDashboard,
@@ -61,7 +80,25 @@ const triggerHaptic = (pattern: number | number[] = 10) => {
 };
 
 function AppContent() {
-  const { config, isLowEnd } = useAdaptivePerformance();
+  const { config: baseConfig, isLowEnd: baseLowEnd } = useAdaptivePerformance();
+  const [ecoMode, setEcoMode] = useState(() => localStorage.getItem('pkr_eco_mode') === 'true');
+
+  const config = useMemo(() => {
+    if (ecoMode) {
+      return {
+        ...baseConfig,
+        enableVideoBackground: false,
+        enableAnimations: false,
+        enableFloat: false,
+        enableScanlines: false,
+        scanlineOpacity: 0,
+        animationDuration: 0,
+      };
+    }
+    return baseConfig;
+  }, [baseConfig, ecoMode]);
+
+  const isLowEnd = baseLowEnd || ecoMode;
   
   const [activeTab, setActiveTab] = useState<'dashboard' | 'regulasi' | 'laporan' | 'dokumentasi' | null>(null);
 
@@ -265,7 +302,7 @@ function AppContent() {
   return (
     <div className={`h-screen bg-slate-950 text-slate-100 flex flex-col relative select-none overflow-hidden ${config.enableScanlines ? 'scanline' : ''}`}>
       {/* Background layers */}
-      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" />
+      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" disabled={ecoMode} />
 
       {/* Ambient glow orbs (disabled on low-end) */}
       {!isLowEnd && config.enableFloat && (
@@ -372,7 +409,27 @@ function AppContent() {
                   </p>
                 </div>
               </div>
-              <ClockDisplay />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  onClick={() => {
+                    const next = !ecoMode;
+                    setEcoMode(next);
+                    localStorage.setItem('pkr_eco_mode', String(next));
+                    triggerHaptic(25);
+                    addToast(next ? '[🔋] MODE ECO AKTIF - VIDEO & ANIMASI DIMATIKAN' : '[⚡] MODE PERFORMA TINGGI AKTIF', 'info');
+                  }}
+                  className={`px-2 py-1 rounded font-mono font-bold text-[8px] sm:text-[9px] uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1 shrink-0 ${
+                    ecoMode
+                      ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/30'
+                      : 'bg-cyan-950/40 border-cyan-500/40 text-cyan-400 hover:bg-cyan-900/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]'
+                  }`}
+                  title={ecoMode ? "Aktifkan efek video & animasi" : "Matikan efek video & animasi untuk menghemat CPU/baterai"}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shrink-0" />
+                  {ecoMode ? 'ECO' : 'PERF'}
+                </button>
+                <ClockDisplay />
+              </div>
             </div>
           </header>
 
