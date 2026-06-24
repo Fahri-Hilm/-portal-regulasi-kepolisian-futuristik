@@ -453,7 +453,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="relative">
               <input
                 type="number"
-                min="1"
+                min="0"
                 max="10000"
                 placeholder="Contoh: 100"
                 value={inflationInput}
@@ -471,7 +471,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   setInflationInput('');
                 }
               }}
-              disabled={!inflationInput || parseInt(inflationInput) < 0}
+              disabled={inflationInput === '' || parseInt(inflationInput) < 0}
               className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 hover:border-amber-400 px-3 py-1.5 rounded-lg font-display font-bold text-[10px] uppercase tracking-widest cursor-pointer transition-all disabled:opacity-30 disabled:cursor-not-allowed hover-bounce"
             >
               Terapkan
