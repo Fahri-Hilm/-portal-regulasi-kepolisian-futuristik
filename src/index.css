@@ -7,6 +7,23 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+/* Base scaling - fix 100% zoom readability */
+html {
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  html {
+    font-size: 12px;
+  }
+}
+
 /* Custom Scrollbar - WebKit (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
   width: 6px;
