@@ -64,9 +64,9 @@ const CONFIG_MAP: Record<DeviceTier, PerformanceConfig> = {
     enableAnimations: true,
     enableGlitch: false,
     enableShimmer: true,
-    enableFloat: true,
-    enableScanlines: true,
-    scanlineOpacity: 50,
+    enableFloat: false, // Disable blurred floating orbs on mid-range to prevent GPU lag
+    enableScanlines: false, // Disable full-screen CSS scanline repaints on mid-range
+    scanlineOpacity: 0,
     animationDuration: 150,
     enableVideoBackground: true,
     videoQuality: 'medium',
@@ -84,8 +84,8 @@ const CONFIG_MAP: Record<DeviceTier, PerformanceConfig> = {
     enableGlitch: false,
     enableShimmer: false,
     enableFloat: false,
-    enableScanlines: true,
-    scanlineOpacity: 30,
+    enableScanlines: false, // Disable scanlines on low-end
+    scanlineOpacity: 0,
     animationDuration: 0, // no animations
     enableVideoBackground: false,
     videoQuality: 'low',

@@ -19,17 +19,8 @@ export function VideoBackground({ src, fallbackColor = '#0a0a0a' }: VideoBackgro
       return null;
     }
 
-    // Slow network (3G): use ultra-low quality
-    if (config.videoQuality === 'low') {
-      return src.replace('.mp4', '_LOW.mp4');
-    }
-
-    // Mid-range: use medium quality
-    if (config.videoQuality === 'medium') {
-      return src.replace('.mp4', '_MEDIUM.mp4');
-    }
-
-    // High-end: use full quality
+    // Use the primary optimized video source directly.
+    // Avoid requesting non-existent _LOW.mp4 or _MEDIUM.mp4 files which cause 404 HTML rewrites.
     return src;
   };
 
