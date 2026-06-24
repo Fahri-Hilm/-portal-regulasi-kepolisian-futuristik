@@ -462,14 +462,14 @@ function AppContent() {
 
               {/* TAB CONTENT */}
               {activeTab !== null && (
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 <motion.div
                   key={activeTab}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: config.enableAnimations ? 0.15 : 0, ease: 'easeOut' }}
-                  className=""
+                  className="h-full"
                 >
                   <Suspense fallback={<div className="flex items-center justify-center h-full"><span className="text-cyan-400 text-xs font-mono animate-pulse">MEMUAT...</span></div>}>
                   {activeTab === 'dashboard' && isDashboardUnlocked && (
@@ -482,6 +482,20 @@ function AppContent() {
                       onApplyInflation={handleApplyInflation}
                       inflationPercent={inflationPercent}
                     />
+                  )}
+
+                  {activeTab === 'dashboard' && !isDashboardUnlocked && (
+                    <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                      <ShieldAlert className="w-12 h-12 text-amber-400/50 mb-3" />
+                      <h3 className="text-cyan-400 font-display font-bold text-sm tracking-widest uppercase mb-2">DASHBOARD TERKUNCI</h3>
+                      <p className="text-slate-500 text-xs mb-4">Masukkan password admin untuk mengakses dashboard.</p>
+                      <button
+                        onClick={() => setShowDashboardPassword(true)}
+                        className="bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 font-display font-bold text-xs uppercase tracking-widest px-4 py-2 rounded-lg hover:bg-cyan-500/30 transition-all cursor-pointer"
+                      >
+                        BUKA DASHBOARD
+                      </button>
+                    </div>
                   )}
 
                   {activeTab === 'regulasi' && (
