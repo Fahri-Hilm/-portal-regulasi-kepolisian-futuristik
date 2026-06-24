@@ -23,19 +23,23 @@
 - ✅ **Incident Report** - Create reports with automatic residivis detection
 - ✅ **Documentation** - Beginner-friendly workflow guide
 - ✅ **Real-time Sync** - Supabase for multi-user collaboration
+- ✅ **Inflation & Deflation Engine** - Adjust all fines dynamically (supporting negative values down to `-99%`, `0%` reset base, and a "RESET BASE" quick shortcut button)
 
 ### Performance Optimizations
 - ✅ **Low-End Device Support** - Auto-detect RAM/CPU/network, adapt rendering
-- ✅ **Service Worker** - Offline support & intelligent caching
+- ✅ **Service Worker** - Offline support & intelligent PWA caching
 - ✅ **Adaptive Rendering** - Video quality tiers (LOW/MEDIUM/HIGH)
 - ✅ **60fps Animations** - GPU-accelerated transforms/opacity only
 - ✅ **Font Optimization** - Preloaded critical fonts, reduced weights
 
 ### UI/UX
 - ✅ **Futuristic Design** - Cyberpunk aesthetic with neon effects
+- ✅ **OLED Pitch Black Theme** - Battery-saving full black aesthetic (`#000000`) with high-contrast neon borders
+- ✅ **Tactile Haptic Feedback** - Native mobile vibration feedback (`navigator.vibrate`) on calculator clicks, toast alerts, and successful transactions
+- ✅ **Web Share API** - Share report/invoice details natively with other apps (WhatsApp, Discord, etc.) or fallback to copy to clipboard in one tap
 - ✅ **Mobile First** - Fully responsive, bottom navigation on mobile
 - ✅ **Accessibility** - prefers-reduced-motion support, WCAG compliant
-- ✅ **Dark Mode** - Built-in dark theme optimized for OLED
+
 
 ---
 
