@@ -85,6 +85,11 @@ html {
   background-size: 100% 4px;
   pointer-events: none;
   opacity: 0.06;
+  /* Hardware acceleration for GPU compositing */
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .scanline-bar {
