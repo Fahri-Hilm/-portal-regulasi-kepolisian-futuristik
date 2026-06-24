@@ -568,14 +568,14 @@ function AppContent() {
                 onClick={item.onClick}
                 className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 font-display font-bold text-[7px] sm:text-[8px] uppercase tracking-wider transition-all cursor-pointer min-h-[56px] ${
                   item.isActive
-                    ? 'text-cyan-400 bg-gradient-to-t from-cyan-950/40 to-transparent'
-                    : 'text-slate-500 active:text-slate-300'
+                    ? 'text-cyan-300 bg-gradient-to-t from-cyan-950/50 via-cyan-900/30 to-transparent'
+                    : 'text-slate-400 active:text-cyan-400'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 ${item.isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                <item.icon className={`w-4 h-4 shrink-0 ${item.isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'text-slate-400'}`} />
                 <span className="truncate max-w-[60px]">{item.label}</span>
                 {item.isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-400 rounded-full" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
                 )}
               </button>
             ))}
