@@ -270,8 +270,8 @@ function AppContent() {
       {/* Ambient glow orbs (disabled on low-end) */}
       {!isLowEnd && config.enableFloat && (
         <>
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none z-0 float-slow" />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none z-0 float-medium" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none z-0" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none z-0" />
         </>
       )}
 
