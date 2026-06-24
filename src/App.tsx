@@ -387,7 +387,7 @@ function AppContent() {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 bg-slate-900/20 border border-cyan-950/50 rounded-xl p-2.5 sm:p-3 relative shadow-inner overflow-y-auto overflow-x-hidden min-h-0 compact-scrollbar">
+            <main className="flex-1 bg-slate-900/20 border border-cyan-950/50 rounded-xl p-2.5 sm:p-3 relative shadow-inner overflow-y-auto overflow-x-hidden min-h-0 compact-scrollbar lg:pb-0 pb-[72px]">
               <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
 
               {/* LANDING PAGE */}
@@ -530,17 +530,28 @@ function AppContent() {
             </main>
           </div>
 
-          {/* Footer */}
-          <footer className="border-t border-cyan-950/40 bg-slate-950/40 py-1.5 text-center text-[10px] font-sans text-slate-600 relative shrink-0 hidden lg:block">
+          {/* Footer - Mobile visible, compact */}
+          <footer className="lg:hidden border-t border-cyan-950/40 bg-slate-950/40 py-1 text-center text-[7px] font-sans text-slate-500 relative shrink-0">
+            <div className="max-w-7xl mx-auto px-2 flex flex-col items-center justify-center gap-0.5">
+              <span>© 2026 Futuristik Roleplay</span>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <span className="text-cyan-500/40 font-mono text-[6px] tracking-wider uppercase">
+                  Fanzy AKA. Fajuu
+                </span>
+                <span className="text-cyan-400/40 font-mono text-[7px] tracking-widest uppercase">
+                  PANEL CODE v10
+                </span>
+              </div>
+            </div>
+          </footer>
+
+          {/* Desktop Footer */}
+          <footer className="hidden lg:block border-t border-cyan-950/40 bg-slate-950/40 py-1.5 text-center text-[10px] font-sans text-slate-600 relative shrink-0">
             <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-1">
               <span>© 2026 Futuristik Roleplay. All Rights Reserved.</span>
               <div className="flex items-center gap-3">
                 <span className="text-cyan-500/40 font-mono text-[8px] tracking-wider uppercase whitespace-nowrap">
                   Fanzy AKA. Fajuu
-                </span>
-                <span className={`text-[9px] font-mono tracking-wider flex items-center gap-1 ${isSupabaseConfigured ? 'text-emerald-400/60' : 'text-amber-400/60'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isSupabaseConfigured ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-                  {isSupabaseConfigured ? 'SUPABASE CONNECTED' : 'OFFLINE MODE'}
                 </span>
                 <span className="text-[9px] text-cyan-400/40 font-mono tracking-widest uppercase">
                   PANEL CODE v10
@@ -549,26 +560,22 @@ function AppContent() {
             </div>
           </footer>
 
-          {/* Mobile Bottom Nav */}
-          <nav className="lg:hidden flex items-stretch border-t border-cyan-950/60 bg-slate-950/80 backdrop-blur-md shrink-0 safe-area-inset-bottom">
+          {/* Mobile Bottom Nav - Compact & Efficient */}
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch border-t border-cyan-950/60 bg-slate-950/95 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 px-1 font-display font-bold text-[8px] sm:text-[9px] uppercase tracking-wider transition-all cursor-pointer ${
+                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 font-display font-bold text-[7px] sm:text-[8px] uppercase tracking-wider transition-all cursor-pointer min-h-[56px] ${
                   item.isActive
-                    ? 'text-cyan-400 bg-cyan-950/30'
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'text-cyan-400 bg-gradient-to-t from-cyan-950/40 to-transparent'
+                    : 'text-slate-500 active:text-slate-300'
                 }`}
               >
-                <item.icon className={`w-4 h-4 ${item.isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
-                {item.label}
+                <item.icon className={`w-4 h-4 shrink-0 ${item.isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                <span className="truncate max-w-[60px]">{item.label}</span>
                 {item.isActive && (
-                  <motion.div
-                    layoutId="mobile-tab-indicator"
-                    className="w-6 h-0.5 bg-cyan-400 rounded-full mt-0.5"
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-400 rounded-full" />
                 )}
               </button>
             ))}

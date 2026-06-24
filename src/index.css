@@ -24,6 +24,18 @@ html {
   }
 }
 
+/* Safe area insets for mobile */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Mobile bottom nav height offset for main content */
+@media (max-width: 1023px) {
+  .mobile-nav-offset {
+    padding-bottom: 72px;
+  }
+}
+
 /* Custom Scrollbar - WebKit (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
   width: 6px;
