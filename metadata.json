@@ -1,0 +1,6 @@
+{
+  "name": "Portal Regulasi Kepolisian Futuristik",
+  "description": "Portal regulasi kepolisian futuristik untuk menghitung denda, mencatat pasal pelanggaran, manajemen anggota, dan melihat statistik aktivitas kepolisian.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
