@@ -44,6 +44,7 @@ export async function fetchRegulations(): Promise<Regulation[]> {
     code: r.code as string,
     description: r.description as string,
     fine: r.fine as number,
+    baseFine: (r.base_fine as number) || (r.fine as number),
     jailTime: r.jail_time as number,
     category: r.category as Regulation['category'],
   }));
@@ -64,6 +65,7 @@ export async function insertRegulation(reg: Regulation): Promise<boolean> {
     code: reg.code,
     description: reg.description,
     fine: reg.fine,
+    base_fine: reg.baseFine,
     jail_time: reg.jailTime,
     category: reg.category,
   });
@@ -86,6 +88,7 @@ export async function updateRegulation(reg: Regulation): Promise<boolean> {
     code: reg.code,
     description: reg.description,
     fine: reg.fine,
+    base_fine: reg.baseFine,
     jail_time: reg.jailTime,
     category: reg.category,
   }).eq('id', reg.id);

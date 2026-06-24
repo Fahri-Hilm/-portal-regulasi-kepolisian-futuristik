@@ -220,6 +220,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       code: formCode.toUpperCase().trim(),
       description: formDescription.trim(),
       fine: fineNumber,
+      baseFine: fineNumber,
       jailTime: jailNumber,
       category: formCategory,
     };

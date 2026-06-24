@@ -189,7 +189,7 @@ function AppContent() {
       const multiplier = 1 + percent / 100;
       const updated = regulations.map((r) => ({
         ...r,
-        fine: Math.round(r.fine * multiplier),
+        fine: Math.round((r.baseFine || r.fine) * multiplier),
       }));
       setRegulations(updated);
       setSelectedRegulations((prev) =>
@@ -201,7 +201,7 @@ function AppContent() {
       setInflationPercent(percent);
       localStorage.setItem('pkr_inflation_percent', JSON.stringify(percent));
       await batchUpdateRegulations(updated);
-      addToast(`[📈] INFLASI: SEMUA DENDA NAIK +${percent}% - SINKRONISASI SELESAI`, 'success');
+      addToast(`[📈] INFLASI: SEMUA DENDA DISET KE BASE +${percent}% - SINKRONISASI SELESAI`, 'success');
     }
   };
 
