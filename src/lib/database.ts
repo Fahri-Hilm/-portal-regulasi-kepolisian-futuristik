@@ -125,6 +125,7 @@ export async function batchUpdateRegulations(regulations: Regulation[]): Promise
   const updates = regulations.map((reg) =>
     supabase!.from('regulations').update({
       fine: reg.fine,
+      base_fine: reg.baseFine,
       jail_time: reg.jailTime,
     }).eq('id', reg.id)
   );

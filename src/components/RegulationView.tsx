@@ -195,11 +195,23 @@ export const RegulationView: React.FC<RegulationViewProps> = ({
                     </div>
                     <div className="flex items-center justify-end md:justify-center shrink-0">
                       {isSelected ? (
-                        <button onClick={() => onRemoveRegulation(reg)} className="flex items-center gap-1 px-2 py-1 bg-red-950/40 hover:bg-red-900/40 text-red-400 text-[9px] font-mono border border-red-500/30 rounded transition-all cursor-pointer">
+                        <button 
+                          onClick={() => {
+                            if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(15);
+                            onRemoveRegulation(reg);
+                          }} 
+                          className="flex items-center gap-1 px-2 py-1 bg-red-950/40 hover:bg-red-900/40 text-red-400 text-[9px] font-mono border border-red-500/30 rounded transition-all cursor-pointer"
+                        >
                           <Minus className="w-3 h-3" />HAPUS
                         </button>
                       ) : (
-                        <button onClick={() => onAddRegulation(reg)} className="flex items-center gap-1 px-2 py-1 bg-cyan-950/40 hover:bg-cyan-500/20 text-cyan-400 text-[9px] font-mono border border-cyan-500/30 rounded transition-all cursor-pointer">
+                        <button 
+                          onClick={() => {
+                            if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+                            onAddRegulation(reg);
+                          }} 
+                          className="flex items-center gap-1 px-2 py-1 bg-cyan-950/40 hover:bg-cyan-500/20 text-cyan-400 text-[9px] font-mono border border-cyan-500/30 rounded transition-all cursor-pointer"
+                        >
                           <Plus className="w-3 h-3" />TAMBAH
                         </button>
                       )}
@@ -255,7 +267,14 @@ export const RegulationView: React.FC<RegulationViewProps> = ({
                       <span className="text-[8px] font-mono font-bold px-1 py-px rounded bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 shrink-0">{reg.code}</span>
                       <span className="text-[9px] text-slate-300 font-sans truncate">{reg.description}</span>
                     </div>
-                    <button onClick={() => onRemoveRegulation(reg)} className="text-slate-500 hover:text-red-400 p-0.5 shrink-0 transition-colors" title="Hapus">
+                    <button 
+                      onClick={() => {
+                        if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+                        onRemoveRegulation(reg);
+                      }} 
+                      className="text-slate-500 hover:text-red-400 p-0.5 shrink-0 transition-colors" 
+                      title="Hapus"
+                    >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </motion.div>
@@ -267,7 +286,10 @@ export const RegulationView: React.FC<RegulationViewProps> = ({
 
         <div className="flex flex-col gap-2 pt-2">
           <button
-            onClick={handleOpenConfirm}
+            onClick={() => {
+              if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
+              handleOpenConfirm();
+            }}
             disabled={selectedRegulations.length === 0}
             className="w-full bg-cyan-400 hover:bg-cyan-300 disabled:bg-cyan-950/20 disabled:text-cyan-900/60 disabled:shadow-none font-display font-bold text-[10px] uppercase tracking-widest text-slate-950 py-2 rounded-lg shadow-[0_0_15px_rgba(6,182,212,0.35)] hover:shadow-[0_0_20px_rgba(6,182,212,0.55)] cursor-pointer transition-all duration-300 flex items-center justify-center gap-1.5"
           >
@@ -275,7 +297,10 @@ export const RegulationView: React.FC<RegulationViewProps> = ({
             KONFIRMASI HITUNG
           </button>
           <button
-            onClick={onResetCalculator}
+            onClick={() => {
+              if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(40);
+              onResetCalculator();
+            }}
             disabled={selectedRegulations.length === 0}
             className="w-full bg-red-950/20 hover:bg-red-900/20 text-red-400 border border-red-500/30 hover:border-red-500/60 disabled:bg-cyan-950/10 disabled:text-cyan-900/40 disabled:border-cyan-950 font-display font-bold text-[10px] uppercase tracking-widest py-2 rounded-lg cursor-pointer transition-all duration-300 flex items-center justify-center gap-1.5"
           >

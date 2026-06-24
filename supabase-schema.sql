@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS regulations (
   code TEXT UNIQUE NOT NULL,
   description TEXT NOT NULL,
   fine NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  base_fine NUMERIC(12, 2) NOT NULL DEFAULT 0,
   jail_time INTEGER NOT NULL DEFAULT 0,
   category TEXT NOT NULL CHECK (category IN ('satlantas', 'ringan', 'menengah', 'berat')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -51,14 +52,30 @@ ALTER TABLE regulations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 
 -- Allow all operations (can be restricted later with Supabase Auth)
+DROP POLICY IF EXISTS "Allow all operations on regulations" ON regulations;
+DROP POLICY IF EXISTS "Allow all operations on reports" ON reports;
 CREATE POLICY "Allow all operations on regulations" ON regulations FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all operations on reports" ON reports FOR ALL USING (true) WITH CHECK (true);
 
 -- ============================================
 -- REALTIME: Enable replication for live sync
 -- ============================================
-ALTER PUBLICATION supabase_realtime ADD TABLE regulations;
-ALTER PUBLICATION supabase_realtime ADD TABLE reports;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'regulations'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE regulations;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'reports'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE reports;
+  END IF;
+END $$;
 
 -- ============================================
 -- FUNCTIONS: Auto-update updated_at
@@ -71,6 +88,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_regulations_updated_at ON regulations;
 CREATE TRIGGER update_regulations_updated_at
   BEFORE UPDATE ON regulations
   FOR EACH ROW

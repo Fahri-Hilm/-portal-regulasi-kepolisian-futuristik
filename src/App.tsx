@@ -50,6 +50,16 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+const triggerHaptic = (pattern: number | number[] = 10) => {
+  if (typeof window !== 'undefined' && navigator.vibrate) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Ignore vibration error due to user gesture requirements
+    }
+  }
+};
+
 function AppContent() {
   const { config, isLowEnd } = useAdaptivePerformance();
   
@@ -92,6 +102,15 @@ function AppContent() {
   const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     setToasts((prev) => [...prev, { id, message, type }]);
+    
+    // Trigger haptic feedback based on toast type
+    if (type === 'success') {
+      triggerHaptic([30, 50, 30]);
+    } else if (type === 'warning') {
+      triggerHaptic(80);
+    } else {
+      triggerHaptic(15);
+    }
   }, []);
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -187,10 +206,14 @@ function AppContent() {
   const handleApplyInflation = async (percent: number) => {
     if (window.confirm(`Yakin ingin menyesuaikan semua denda sebesar ${percent}%?`)) {
       const multiplier = 1 + percent / 100;
-      const updated = regulations.map((r) => ({
-        ...r,
-        fine: Math.round((r.baseFine || r.fine) * multiplier),
-      }));
+      const updated = regulations.map((r) => {
+        const base = r.baseFine !== undefined ? r.baseFine : r.fine;
+        return {
+          ...r,
+          baseFine: base,
+          fine: Math.round(base * multiplier),
+        };
+      });
       setRegulations(updated);
       setSelectedRegulations((prev) =>
         prev.map((r) => {

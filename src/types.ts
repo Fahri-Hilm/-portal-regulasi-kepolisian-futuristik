@@ -5,7 +5,7 @@ export interface Regulation {
   code: string;
   description: string;
   fine: number;
-  baseFine: number;
+  baseFine?: number;
   jailTime: number;
   category: RegulationCategory;
 }

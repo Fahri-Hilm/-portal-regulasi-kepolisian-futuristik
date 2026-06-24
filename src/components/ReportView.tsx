@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { IncidentReport, Regulation, ReportType } from '../types';
-import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert } from 'lucide-react';
+import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ReportViewProps {
@@ -39,6 +39,46 @@ export const ReportView: React.FC<ReportViewProps> = ({
     new Date(isoStr).toLocaleString('id-ID', {
       year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
     });
+
+  const handleShareInvoice = async (rep: IncidentReport) => {
+    if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(20);
+
+    const articleCodes = rep.articles.map((aid) => {
+      const reg = regulations.find((r) => r.id === aid);
+      return reg ? `[${reg.code}] ${reg.description}` : aid;
+    }).join('\n');
+
+    const shareText = `🚔 *SURAT TILANG KOTA* 🚔\n` +
+      `ID: ${rep.id.toUpperCase()}\n` +
+      `Tanggal: ${formatDate(rep.timestamp)}\n` +
+      `---------------------------------\n` +
+      `*Pelanggar/Tersangka:* ${rep.citizenName}\n` +
+      `*Tipe:* ${rep.type === 'lalu_lintas' ? 'Lalu Lintas' : 'Kriminal'}\n` +
+      `---------------------------------\n` +
+      `*Rincian Pasal:*\n${articleCodes}\n` +
+      `---------------------------------\n` +
+      `*Total Denda:* ${formatCurrency(rep.totalFine)}\n` +
+      `*Kurungan:* ${rep.totalJailTime} Bulan\n\n` +
+      `_Harap segera melakukan pembayaran atau datang ke Markas Kepolisian terdekat._`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Surat Tilang - ${rep.citizenName}`,
+          text: shareText,
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert('Teks salinan tilang berhasil disalin ke clipboard!');
+      } catch (err) {
+        console.error('Clipboard fallback failed:', err);
+      }
+    }
+  };
 
   const renderReportCard = (rep: IncidentReport) => {
     const isRepeatTraffic = rep.type === 'lalu_lintas' && (trafficRepeatOffenders[rep.citizenName.toLowerCase()] || 0) > 1;
@@ -255,6 +295,13 @@ export const ReportView: React.FC<ReportViewProps> = ({
                   >
                     <Printer className="w-3 h-3" />
                     CETAK
+                  </button>
+                  <button
+                    onClick={() => handleShareInvoice(invoiceReport!)}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded cursor-pointer transition-all uppercase text-[9px]"
+                  >
+                    <Share2 className="w-3 h-3" />
+                    BAGIKAN
                   </button>
                   <button
                     onClick={() => setInvoiceReport(null)}
