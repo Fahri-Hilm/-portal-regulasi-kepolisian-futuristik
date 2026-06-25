@@ -127,6 +127,8 @@ function AppContent() {
       triggerHaptic([30, 50, 30]);
     } else if (type === 'warning') {
       triggerHaptic(80);
+    } else if (type === 'system') {
+      triggerHaptic([40, 45, 40, 45, 90]); // Tech double-blip + long sync override pulse
     } else {
       triggerHaptic(15);
     }
@@ -256,7 +258,12 @@ function AppContent() {
       setInflationPercent(percent);
       localStorage.setItem('pkr_inflation_percent', JSON.stringify(percent));
       await batchUpdateRegulations(updated);
-      addToast(`[📈] INFLASI: SEMUA DENDA DISET KE BASE +${percent}% - SINKRONISASI SELESAI`, 'success');
+      
+      if (percent === 0) {
+        addToast('[🔄 SYSTEM OVERRIDE] RESTORASI EKONOMI: SELURUH NOMINAL DENDA DIKEMBALIKAN KE HARGA DASAR (BASE LEVEL) [STATUS: NORMAL]', 'system');
+      } else {
+        addToast(`[⚡ SYSTEM OVERRIDE] PROTOKOL INFLASI AKTIF: MATRIX NOMINAL DENDA DISINKRONISASI KE BASE +${percent}% [STATUS: ONLINE]`, 'system');
+      }
     }
   };
 

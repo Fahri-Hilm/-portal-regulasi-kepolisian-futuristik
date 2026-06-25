@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Info, X, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-export type ToastType = 'success' | 'warning' | 'error' | 'info';
+export type ToastType = 'success' | 'warning' | 'error' | 'info' | 'system';
 
 export interface Toast {
   id: string;
@@ -21,13 +21,15 @@ const iconMap: Record<ToastType, React.ReactNode> = {
   warning: <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />,
   error: <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />,
   info: <Info className="w-3.5 h-3.5 text-cyan-400 shrink-0" />,
+  system: <Cpu className="w-3.5 h-3.5 text-cyan-400 shrink-0 animate-pulse relative z-10" />,
 };
 
 const bgMap: Record<ToastType, string> = {
-  success: 'bg-emerald-500/10 border-emerald-500/30',
-  warning: 'bg-amber-500/10 border-amber-500/30',
-  error: 'bg-red-500/10 border-red-500/30',
-  info: 'bg-cyan-500/10 border-cyan-500/30',
+  success: 'bg-emerald-500/10 border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.1)]',
+  warning: 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.1)]',
+  error: 'bg-red-500/10 border-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.1)]',
+  info: 'bg-cyan-500/10 border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.1)]',
+  system: 'bg-slate-950/80 border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.25)] relative overflow-hidden',
 };
 
 const textMap: Record<ToastType, string> = {
@@ -35,6 +37,7 @@ const textMap: Record<ToastType, string> = {
   warning: 'text-amber-400',
   error: 'text-red-400',
   info: 'text-cyan-400',
+  system: 'text-cyan-400 font-mono tracking-wide text-[10px] leading-relaxed relative z-10',
 };
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
@@ -68,8 +71,13 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={`pointer-events-auto flex items-start gap-2 p-2.5 rounded-lg border backdrop-blur-md shadow-lg ${bgMap[toast.type]}`}
     >
+      {toast.type === 'system' && (
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent pointer-events-none rounded-lg overflow-hidden">
+          <div className="absolute inset-0 shimmer opacity-25" />
+        </div>
+      )}
       {iconMap[toast.type]}
-      <span className={`text-[11px] font-sans flex-1 ${textMap[toast.type]}`}>
+      <span className={`flex-1 ${textMap[toast.type]} ${toast.type !== 'system' ? 'text-[11px] font-sans' : ''}`}>
         {toast.message}
       </span>
       <button
@@ -77,7 +85,7 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
           setIsExiting(true);
           setTimeout(() => onRemove(toast.id), 300);
         }}
-        className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer shrink-0"
+        className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer shrink-0 relative z-10"
       >
         <X className="w-3 h-3" />
       </button>
