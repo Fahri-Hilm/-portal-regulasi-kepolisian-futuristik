@@ -166,6 +166,19 @@ Portal Regulasi Kepolisian (React 19 + TypeScript)
 
 ## 🔄 Riwayat Pembaruan (Changelog)
 
+### v1.3.0 — 2026-06-25 *(Terbaru)*
+
+#### 📊 Rebalancing Data Pasal (Inflasi Ekonomi Kota)
+- **[DATA]** Seluruh 40 pasal disesuaikan dengan inflasi ekonomi kota (+300% hingga +500%)
+- **[DATA]** Referensi harga baru: Tindakan medis Rp200.000 | Operasi sedang Rp400.000 | Operasi besar Rp600.000
+- **[RULE]** Batas maksimal masa tahanan ditetapkan **120 bulan** per peraturan kota
+- **[RULE]** Denda tidak memiliki batas atas — mengikuti bobot pelanggaran
+- **[FIX]** Tumpang tindih PR-06 vs PM-06 diperbaiki: PR-06 → "Vandalisme/Coret-coret Kecil", PM-06 → "Perusakan Properti Besar"
+- **[FIX]** PB-09 (Bunuh Polisi) kini lebih berat dari PB-01 (Bunuh Sipil) — logika hukum diperbaiki
+- **[DOC]** File `REVISI_PASAL.md` dibuat — dokumentasi lengkap alasan perubahan tiap pasal
+
+---
+
 ### v1.2.0 — 2026-06-25 *(Terbaru)*
 
 #### 📱 Android-First Improvements
@@ -392,6 +405,7 @@ Konfigurasi SPA routing sudah tersedia di `vercel.json`:
 |------|-----|
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Panduan deployment lengkap |
 | [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) | Verifikasi pra-deploy |
+| [REVISI_PASAL.md](./REVISI_PASAL.md) | **Dokumentasi lengkap perubahan & alasan tiap pasal** |
 | [supabase-schema.sql](./supabase-schema.sql) | Skema database |
 | [.env.example](./.env.example) | Template variabel environment |
 
