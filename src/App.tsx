@@ -80,25 +80,7 @@ const triggerHaptic = (pattern: number | number[] = 10) => {
 };
 
 function AppContent() {
-  const { config: baseConfig, isLowEnd: baseLowEnd } = useAdaptivePerformance();
-  const [ecoMode, setEcoMode] = useState(() => localStorage.getItem('pkr_eco_mode') === 'true');
-
-  const config = useMemo(() => {
-    if (ecoMode) {
-      return {
-        ...baseConfig,
-        enableVideoBackground: false,
-        enableAnimations: false,
-        enableFloat: false,
-        enableScanlines: false,
-        scanlineOpacity: 0,
-        animationDuration: 0,
-      };
-    }
-    return baseConfig;
-  }, [baseConfig, ecoMode]);
-
-  const isLowEnd = baseLowEnd || ecoMode;
+  const { config, isLowEnd } = useAdaptivePerformance();
   
   const [activeTab, setActiveTab] = useState<'dashboard' | 'regulasi' | 'laporan' | 'dokumentasi' | null>(null);
 
@@ -302,13 +284,16 @@ function AppContent() {
   return (
     <div className={`h-screen bg-slate-950 text-slate-100 flex flex-col relative select-none overflow-hidden ${config.enableScanlines ? 'scanline' : ''}`}>
       {/* Background layers */}
-      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" disabled={ecoMode} />
+      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" />
 
       {/* Ambient glow orbs (disabled on low-end) */}
+      {/* Optimized: Using hardware-accelerated CSS radial-gradients instead of expensive CPU-heavy blur-3xl filter */}
       {!isLowEnd && config.enableFloat && (
         <>
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none z-0" />
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none z-0" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 md:w-96 md:h-96 rounded-full pointer-events-none z-0 float-slow"
+               style={{ background: 'radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%)' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 md:w-96 md:h-96 rounded-full pointer-events-none z-0 float-medium"
+               style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%)' }} />
         </>
       )}
 
@@ -409,27 +394,7 @@ function AppContent() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <button
-                  onClick={() => {
-                    const next = !ecoMode;
-                    setEcoMode(next);
-                    localStorage.setItem('pkr_eco_mode', String(next));
-                    triggerHaptic(25);
-                    addToast(next ? '[🔋] MODE ECO AKTIF - VIDEO & ANIMASI DIMATIKAN' : '[⚡] MODE PERFORMA TINGGI AKTIF', 'info');
-                  }}
-                  className={`px-2 py-1 rounded font-mono font-bold text-[8px] sm:text-[9px] uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1 shrink-0 ${
-                    ecoMode
-                      ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/30'
-                      : 'bg-cyan-950/40 border-cyan-500/40 text-cyan-400 hover:bg-cyan-900/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]'
-                  }`}
-                  title={ecoMode ? "Aktifkan efek video & animasi" : "Matikan efek video & animasi untuk menghemat CPU/baterai"}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse shrink-0" />
-                  {ecoMode ? 'ECO' : 'PERF'}
-                </button>
-                <ClockDisplay />
-              </div>
+              <ClockDisplay />
             </div>
           </header>
 

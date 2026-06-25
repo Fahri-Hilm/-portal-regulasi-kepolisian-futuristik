@@ -4,10 +4,9 @@ import { useAdaptivePerformance } from '../contexts/AdaptivePerformanceContext';
 interface VideoBackgroundProps {
   src: string;
   fallbackColor?: string;
-  disabled?: boolean;
 }
 
-export function VideoBackground({ src, fallbackColor = '#000000', disabled = false }: VideoBackgroundProps) {
+export function VideoBackground({ src, fallbackColor = '#000000' }: VideoBackgroundProps) {
   const { config, tier, isLowEnd } = useAdaptivePerformance();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -26,7 +25,7 @@ export function VideoBackground({ src, fallbackColor = '#000000', disabled = fal
   };
 
   const videoSource = getVideoSource();
-  const shouldLoadVideo = videoSource !== null && config.enableVideoBackground && !disabled;
+  const shouldLoadVideo = videoSource !== null && config.enableVideoBackground;
 
   useEffect(() => {
     if (!shouldLoadVideo) {
@@ -113,6 +112,13 @@ export function VideoBackground({ src, fallbackColor = '#000000', disabled = fal
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
           isVideoLoaded ? 'opacity-100' : 'opacity-0'
         }`}
+        style={{
+          transform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          contain: 'strict',
+        }}
         preload={preloadStrategy}
         autoPlay
         muted
