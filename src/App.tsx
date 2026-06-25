@@ -137,6 +137,28 @@ function AppContent() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  // ── Android back-button support via History API ──────────────────────────
+  // navigateTo: ganti setActiveTab + push history entry agar tombol back
+  // Android kembali ke tab sebelumnya, bukan keluar dari browser.
+  const navigateTo = useCallback((tab: 'dashboard' | 'regulasi' | 'laporan' | 'dokumentasi' | null) => {
+    setActiveTab(tab);
+    if (tab !== null) {
+      window.history.pushState({ pkrTab: tab }, '');
+    }
+  }, []);
+
+  useEffect(() => {
+    // Set state awal agar ada entry yang bisa di-pop
+    window.history.replaceState({ pkrTab: null }, '');
+
+    const handlePopState = (e: PopStateEvent) => {
+      const tab = e.state?.pkrTab ?? null;
+      setActiveTab(tab);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Load data from Supabase on mount (with localStorage fallback)
   const refreshData = useCallback(async () => {
     const [regs, reps] = await Promise.all([fetchRegulations(), fetchReports()]);
@@ -315,7 +337,7 @@ function AppContent() {
       setDashboardPasswordInput('');
       setDashboardPassError('');
       localStorage.setItem('pkr_dashboard_unlocked', JSON.stringify({ expiry: Date.now() + 24 * 60 * 60 * 1000 }));
-      setActiveTab('dashboard');
+      navigateTo('dashboard');
       addToast('[🔓] DASHBOARD ADMIN BERHASIL DIBUKA - SESSION AKTIF 24 JAM', 'success');
     } else {
       setDashboardPassError('PASSWORD SALAH! AKSES DITOLAK.');
@@ -328,15 +350,15 @@ function AppContent() {
       setDashboardPasswordInput('');
       setDashboardPassError('');
     } else {
-      setActiveTab('dashboard');
+      navigateTo('dashboard');
     }
   };
 
   const navItems = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: LayoutDashboard, onClick: handleDashboardTabClick, isActive: activeTab === 'dashboard' && isDashboardUnlocked },
-    { id: 'regulasi' as const, label: 'Regulasi', icon: BookOpen, onClick: () => setActiveTab('regulasi'), isActive: activeTab === 'regulasi' },
-    { id: 'laporan' as const, label: 'Laporan', icon: FileSpreadsheet, onClick: () => setActiveTab('laporan'), isActive: activeTab === 'laporan' },
-    { id: 'dokumentasi' as const, label: 'Dokumentasi', icon: HelpCircle, onClick: () => setActiveTab('dokumentasi'), isActive: activeTab === 'dokumentasi' },
+    { id: 'regulasi' as const, label: 'Regulasi', icon: BookOpen, onClick: () => navigateTo('regulasi'), isActive: activeTab === 'regulasi' },
+    { id: 'laporan' as const, label: 'Laporan', icon: FileSpreadsheet, onClick: () => navigateTo('laporan'), isActive: activeTab === 'laporan' },
+    { id: 'dokumentasi' as const, label: 'Dokumentasi', icon: HelpCircle, onClick: () => navigateTo('dokumentasi'), isActive: activeTab === 'dokumentasi' },
   ];
 
   return (
@@ -515,14 +537,14 @@ function AppContent() {
 
                     <div className="flex flex-col sm:flex-row gap-2 mb-4">
                       <button
-                        onClick={() => setActiveTab('regulasi')}
+                        onClick={() => navigateTo('regulasi')}
                         className="group flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/40 hover:bg-cyan-500/20 hover:border-cyan-400/60 text-cyan-400 font-display font-bold text-[10px] sm:text-xs uppercase tracking-widest px-5 py-2 rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)] cursor-pointer"
                       >
                         Mulai
                         <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button
-                        onClick={() => setActiveTab('dokumentasi')}
+                        onClick={() => navigateTo('dokumentasi')}
                         className="flex items-center gap-2 bg-slate-900/40 border border-slate-700/40 hover:bg-slate-800/40 hover:border-slate-600/40 text-slate-400 hover:text-slate-300 font-display font-bold text-[10px] sm:text-xs uppercase tracking-widest px-5 py-2 rounded-lg transition-all duration-300 cursor-pointer"
                       >
                         Panduan
@@ -629,7 +651,7 @@ function AppContent() {
                         };
                         handleAddReport(report);
                         handleResetCalculator();
-                        setActiveTab('laporan');
+                        navigateTo('laporan');
                       }}
                     />
                   )}
