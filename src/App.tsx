@@ -20,8 +20,8 @@ const ClockDisplay = memo(function ClockDisplay() {
   }, []);
 
   return (
-    <div className="flex items-center gap-2 bg-slate-900/30 border border-cyan-950/60 rounded px-2 sm:px-2.5 py-1 sm:py-1.5 font-mono shadow-[inset_0_1px_3px_rgba(0,0,0,0.6)] shrink-0">
-      <ClockIcon className="w-3 h-3 text-cyan-400 animate-pulse shrink-0" />
+    <div className="flex items-center gap-2 bg-slate-900/30 border border-cyan-950/60 rounded px-2 sm:px-2.5 py-1 sm:py-1.5 font-mono shadow-[inset_0_1px_3px_rgba(0,0,0,0.6)] shrink-0" aria-live="off" aria-atomic="true">
+      <ClockIcon className="w-3 h-3 text-cyan-400 animate-pulse shrink-0" aria-hidden="true" />
       <div className="text-right">
         <span className="text-cyan-400 font-bold tracking-wider block text-[10px] sm:text-xs leading-none">
           {time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -58,15 +58,13 @@ const DashboardView = lazyWithRetry(() => import('./components/DashboardView'), 
 const ReportView = lazyWithRetry(() => import('./components/ReportView'), 'ReportView');
 const DocumentationView = lazyWithRetry(() => import('./components/DocumentationView'), 'DocumentationView');
 
-import {
-  LayoutDashboard,
-  BookOpen,
-  FileSpreadsheet,
-  Clock as ClockIcon,
-  ShieldAlert,
-  HelpCircle,
-  ChevronRight,
-} from 'lucide-react';
+import LayoutDashboard from 'lucide-react/dist/esm/icons/layout-dashboard';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open';
+import FileSpreadsheet from 'lucide-react/dist/esm/icons/file-spreadsheet';
+import ClockIcon from 'lucide-react/dist/esm/icons/clock';
+import ShieldAlert from 'lucide-react/dist/esm/icons/shield-alert';
+import HelpCircle from 'lucide-react/dist/esm/icons/help-circle';
+import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import { motion, AnimatePresence } from 'motion/react';
 
 const triggerHaptic = (pattern: number | number[] = 10) => {
@@ -374,7 +372,7 @@ function AppContent() {
   return (
     <div className={`h-screen bg-slate-950 text-slate-100 flex flex-col relative select-none overflow-hidden ${config.enableScanlines ? 'scanline' : ''}`}>
       {/* Background layers */}
-      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" />
+      <VideoBackground src="/Video_background_polisi_RP_202606240209.mp4" aria-hidden={true} />
 
       {/* Ambient glow orbs (disabled on low-end) */}
       {/* Optimized: Using hardware-accelerated CSS radial-gradients instead of expensive CPU-heavy blur-3xl filter */}
@@ -399,10 +397,14 @@ function AppContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dashboard-password-title"
           >
             <div
               onClick={() => setShowDashboardPassword(false)}
               className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm"
+              aria-hidden="true"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -419,7 +421,7 @@ function AppContent() {
                 >
                   <ShieldAlert className="w-8 h-8 text-amber-400 mx-auto mb-2" />
                 </motion.div>
-                <h3 className="text-cyan-400 font-display font-bold text-xs tracking-widest uppercase">AKSES DASHBOARD</h3>
+                <h3 id="dashboard-password-title" className="text-cyan-400 font-display font-bold text-xs tracking-widest uppercase">AKSES DASHBOARD</h3>
                 <p className="text-slate-500 text-[10px] font-sans mt-1">Masukkan password admin untuk mengakses dashboard.</p>
               </div>
 
@@ -442,18 +444,22 @@ function AppContent() {
                   onChange={(e) => { setDashboardPasswordInput(e.target.value); setDashboardPassError(''); }}
                   className="w-full bg-slate-900 border border-cyan-950 rounded p-2.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 font-mono text-center tracking-widest transition-all"
                   autoFocus
+                  aria-label="Password dashboard admin"
+                  autoComplete="current-password"
                 />
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setShowDashboardPassword(false)}
                     className="px-3 py-2 bg-slate-900 border border-cyan-950 hover:bg-slate-800 text-slate-400 text-[10px] font-mono rounded cursor-pointer transition-all"
+                    aria-label="Batalkan dan tutup dialog"
                   >
                     BATAL
                   </button>
                   <button
                     type="submit"
                     className="flex-1 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-display font-bold text-[10px] uppercase tracking-widest py-2 rounded-lg cursor-pointer transition-all hover-bounce"
+                    aria-label="Buka dashboard"
                   >
                     UNLOCK
                   </button>
@@ -464,10 +470,15 @@ function AppContent() {
         )}
       </AnimatePresence>
 
+      {/* Skip Navigation */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-cyan-400 focus:text-slate-950 focus:px-4 focus:py-2 focus:rounded-lg focus:font-display focus:font-bold focus:text-xs focus:uppercase focus:tracking-widest focus:shadow-[0_0_20px_rgba(6,182,212,0.5)] focus:outline-none">
+        Lewati ke Konten Utama
+      </a>
+
       {/* Main App */}
       <div className="flex-1 flex flex-col relative z-10 min-h-0">
           {/* Header - responsive */}
-          <header className="border-b border-cyan-950/60 bg-slate-950/70 backdrop-blur-md px-3 sm:px-4 py-2 relative shrink-0">
+          <header className="border-b border-cyan-950/60 bg-slate-950/70 backdrop-blur-md px-3 sm:px-4 py-2 relative shrink-0" role="banner">
             <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -495,6 +506,9 @@ function AppContent() {
             {/* Main Content */}
             <main
               ref={mainRef}
+              id="main-content"
+              role="tabpanel"
+              aria-label={activeTab || 'Beranda'}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -716,12 +730,17 @@ function AppContent() {
           </footer>
 
           {/* Desktop Floating Dock */}
-          <nav className="hidden lg:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-50 items-center gap-2 p-2 bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-[0_10px_40px_-10px_rgba(6,182,212,0.3)]">
+          <nav className="hidden lg:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-50 items-center gap-2 p-2 bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-[0_10px_40px_-10px_rgba(6,182,212,0.3)]" aria-label="Navigasi utama" role="navigation">
+            <div role="tablist" aria-label="Menu navigasi" className="contents">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className={`relative flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-display font-bold text-[11px] uppercase tracking-widest transition-all duration-300 cursor-pointer overflow-hidden group ${
+                role="tab"
+                aria-selected={item.isActive}
+                aria-controls={`panel-${item.id}`}
+                tabIndex={item.isActive ? 0 : -1}
+                className={`relative flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-display font-bold text-[11px] uppercase tracking-widest transition-all duration-300 cursor-pointer overflow-hidden group focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-950 ${
                   item.isActive
                     ? 'text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
                     : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-900/60'
@@ -743,15 +762,21 @@ function AppContent() {
                 )}
               </button>
             ))}
+            </div>
           </nav>
 
-          {/* Mobile Bottom Nav - Compact & Efficient */}
-          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch border-t border-cyan-950/60 bg-slate-950/95 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]">
+          {/* Mobile Bottom Nav */}
+          <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch border-t border-cyan-950/60 bg-slate-950/95 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]" aria-label="Navigasi utama" role="navigation">
+            <div role="tablist" aria-label="Menu navigasi" className="contents">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 font-display font-bold text-[7px] sm:text-[8px] uppercase tracking-wider transition-all cursor-pointer min-h-[56px] ${
+                role="tab"
+                aria-selected={item.isActive}
+                aria-controls={`panel-${item.id}`}
+                tabIndex={item.isActive ? 0 : -1}
+                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 font-display font-bold text-[7px] sm:text-[8px] uppercase tracking-wider transition-all cursor-pointer min-h-[56px] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-400 ${
                   item.isActive
                     ? 'text-cyan-300 bg-gradient-to-t from-cyan-950/50 via-cyan-900/30 to-transparent'
                     : 'text-slate-400 active:text-cyan-400'
@@ -771,6 +796,7 @@ function AppContent() {
                 )}
               </button>
             ))}
+            </div>
           </nav>
         </div>
     </div>

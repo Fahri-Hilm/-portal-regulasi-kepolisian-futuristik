@@ -18,6 +18,8 @@ export const Logo: React.FC<LogoProps> = ({ className = 'w-12 h-12', glow = true
         className="w-full h-full drop-shadow-[0_0_12px_rgba(6,182,212,0.8)] filter transition-all duration-300 hover:scale-105"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        role="img"
+        aria-label="Logo Portal Regulasi Kepolisian"
       >
         <defs>
           {/* Main Cyan Metallic Gradient */}

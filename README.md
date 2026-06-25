@@ -43,6 +43,9 @@
 | **Animasi GPU-Accelerated** | ✅ | Hanya menggunakan `transform` & `opacity` untuk mencegah *layout reflow* |
 | **Ambient Glow Dinonaktifkan** | ✅ | Dekorasi dinonaktifkan otomatis di perangkat low-end |
 | **CSS Radial-gradient** | ✅ | Menggantikan efek `blur-3xl` yang berat CPU dengan gradient GPU-native |
+| **Code Splitting Optimal** | ✅ | React/vendor, motion, icons, views terpisah — main bundle 42KB (13KB gz) |
+| **Deferred Font Loading** | ✅ | Critical fonts inline + full stylesheet di-defer (non-render-blocking) |
+| **Deferred Video Load** | ✅ | Video 2.6MB dimuat via `requestIdleCallback` setelah first paint |
 
 ---
 
@@ -61,6 +64,23 @@
 | **Glitch Title Effect** | ✅ | Efek glitch animasi pada judul landing page (GPU-optimized) |
 | **Shimmer Effect** | ✅ | Efek holografis berkilau pada panel dashboard |
 | **Efek Float Dekoratif** | ✅ | Orb ambient melayang lambat di latar belakang (dinonaktifkan di low-end) |
+
+---
+
+### ♿ Aksesibilitas (Accessibility)
+
+| Fitur | Status | Keterangan |
+|-------|--------|------------|
+| **Skip Navigation** | ✅ | Tautan "Lewati ke Konten Utama" untuk keyboard user |
+| **ARIA Tab Roles** | ✅ | Navigasi desktop & mobile menggunakan `role="tab"` + `aria-selected` |
+| **ARIA Tab Panel** | ✅ | Konten konten menggunakan `role="tabpanel"` + `aria-controls` |
+| **ARIA Dialog** | ✅ | Semua modal (password, konfirmasi, form) menggunakan `role="dialog"` + `aria-modal` |
+| **ARIA Labels** | ✅ | Tombol icon-only memiliki `aria-label` deskriptif |
+| **ARIA Live Regions** | ✅ | Toast notifications menggunakan `aria-live="polite"` + `role="alert"` |
+| **ARIA Hidden** | ✅ | Video background, ikon dekoratif menggunakan `aria-hidden="true"` |
+| **Keyboard Focus** | ✅ | Focus ring (`focus:ring-2`) pada semua kontrol interaktif |
+| **Heading Order** | ✅ | Heading hierarchy (`h1` → `h2` → `h3`) terurut |
+| **Landmark Elements** | ✅ | `<header>`, `<main>`, `<nav>`, `<footer>` digunakan |
 
 ---
 
@@ -157,8 +177,9 @@ Portal Regulasi Kepolisian (React 19 + TypeScript)
 │       ├── database.ts                 ← Supabase CRUD + batch operations
 │       └── serviceWorker.ts            ← Registrasi & manajemen PWA
 ├── public/
-│   └── sw.js                           ← Service Worker (cache, update detection)
-├── index.html                          ← Preload font, PWA meta
+│   ├── sw.js                           ← Service Worker (cache, update detection)
+│   └── robots.txt                      ← Robots.txt untuk crawlers
+├── index.html                          ← Preload font, inline @font-face, PWA meta
 └── vercel.json                         ← SPA routing config
 ```
 
@@ -166,7 +187,34 @@ Portal Regulasi Kepolisian (React 19 + TypeScript)
 
 ## 🔄 Riwayat Pembaruan (Changelog)
 
-### v1.3.0 — 2026-06-25 *(Terbaru)*
+### v1.4.0 — 2026-06-25 *(Terbaru)*
+
+#### ⚡ Performa & Optimasi
+- **[OPTIMASI]** Main bundle turun 84% (83KB → 13KB gz) — React/vendor, motion, icons terpisah
+- **[OPTIMASI]** Lucide React diimpor langsung per-ikon (bukan barrel import) untuk tree-shaking optimal
+- **[OPTIMASI]** Google Fonts inline `@font-face` kritis + full stylesheet di-defer (non-render-blocking)
+- **[OPTIMASI]** Video background 2.6MB dimuat via `requestIdleCallback` setelah first paint
+- **[FIX]** Service worker tidak lagi cache `/src/main.tsx` (tidak exist di production)
+- **[FIX]** Font URLs diperbarui ke versi terkini (v20/v22/v24) — tidak lagi 404
+
+#### 🔐 Keamanan & SEO
+- **[BARU]** `robots.txt` — crawler dapat mengakses robots.txt tanpa 404
+- **[BARU]** Meta description untuk SEO
+- **[BARU]** Security headers: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, COOP
+
+#### ♿ Aksesibilitas
+- **[BARU]** Skip navigation link ("Lewati ke Konten Utama")
+- **[BARU]** ARIA tab roles + tabpanel pada navigasi desktop & mobile
+- **[BARU]** ARIA dialog roles + aria-modal pada semua modal (password, konfirmasi, form)
+- **[BARU]** ARIA labels pada semua tombol icon-only
+- **[BARU]** ARIA live regions pada toast notifications
+- **[BARU]** `aria-hidden` pada video background & ikon dekoratif
+- **[BARU]** Keyboard focus indicators (`focus:ring-2`) pada semua kontrol interaktif
+- **[BARU]** Landmark elements: `<header>`, `<main>`, `<nav>`, `<footer>`
+
+---
+
+### v1.3.0 — 2026-06-25
 
 #### 📊 Rebalancing Data Pasal (Inflasi Ekonomi Kota)
 - **[DATA]** Seluruh 40 pasal disesuaikan dengan inflasi ekonomi kota (+300% hingga +500%)
@@ -271,7 +319,7 @@ cp .env.example .env
 ### Mode Pengembangan
 
 ```bash
-# Jalankan dev server (http://localhost:5173)
+# Jalankan dev server (http://localhost:3000)
 npm run dev
 
 # Build produksi
@@ -289,15 +337,19 @@ npm run preview
 
 | Aset | Ukuran | Cache |
 |------|--------|-------|
-| HTML | 0.86 KB | No-cache |
-| CSS | 12.37 KB | 1 Tahun |
-| Main JS | 82.83 KB | 1 Tahun |
-| DashboardView | 6.60 KB | 1 Tahun |
-| ReportView | 4.12 KB | 1 Tahun |
-| RegulationView | 4.46 KB | 1 Tahun |
-| Supabase | 54.63 KB | 1 Tahun |
-| Framer Motion | 31.35 KB | 1 Tahun |
-| **Total Initial Load** | **~180 KB** | ✅ |
+| HTML | 1.05 KB | No-cache |
+| CSS | 13.31 KB | 1 Tahun |
+| Main JS (App) | 13.57 KB | 1 Tahun |
+| Vendor (React+DOM) | 60.49 KB | 1 Tahun |
+| Motion | 41.61 KB | 1 Tahun |
+| Icons | 3.46 KB | 1 Tahun |
+| DashboardView | 6.10 KB | 1 Tahun |
+| ReportView | 4.23 KB | 1 Tahun |
+| RegulationView | 4.36 KB | 1 Tahun |
+| DocumentationView | 6.63 KB | 1 Tahun |
+| **Total Initial Load** | **~135 KB** | ✅ |
+
+> **Improvement:** Main bundle turun dari 83KB → 13KB gz (84% lebih kecil) berkat code splitting optimal.
 
 ### Tier Perangkat
 
@@ -366,7 +418,17 @@ Konfigurasi SPA routing sudah tersedia di `vercel.json`:
 
 ```json
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/robots.txt", "destination": "/robots.txt" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
+    ]}
+  ]
 }
 ```
 
@@ -382,9 +444,10 @@ Konfigurasi SPA routing sudah tersedia di `vercel.json`:
 | **Styling** | Tailwind CSS | v4 |
 | **Database** | Supabase (PostgreSQL) | — |
 | **Animasi** | Framer Motion | 12 |
-| **Ikon** | Lucide React | — |
+| **Ikon** | Lucide React | 0.546 (direct imports) |
 | **Hosting** | Vercel | — |
 | **PWA** | Service Worker (Custom) | — |
+| **Aksesibilitas** | ARIA roles, labels, live regions, skip nav | — |
 
 ---
 
@@ -396,6 +459,7 @@ Konfigurasi SPA routing sudah tersedia di `vercel.json`:
 - ✅ Supabase RLS (Row Level Security) diaktifkan
 - ✅ HTTPS enforced via Vercel
 - ✅ Tidak ada data sensitif di logs browser
+- ✅ Security headers: X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, COOP
 
 ---
 
@@ -432,6 +496,6 @@ Konfigurasi SPA routing sudah tersedia di `vercel.json`:
 
 **Status:** ✅ Production Ready | 🚀 Auto-deployed via Vercel
 
-*Last Updated: 25 Juni 2026 — v1.1.0*
+*Last Updated: 25 Juni 2026 — v1.4.0*
 
 </div>

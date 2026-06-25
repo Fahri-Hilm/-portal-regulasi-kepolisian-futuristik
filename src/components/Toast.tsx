@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, AlertTriangle, Info, X, Cpu } from 'lucide-react';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle';
+import Info from 'lucide-react/dist/esm/icons/info';
+import X from 'lucide-react/dist/esm/icons/x';
+import Cpu from 'lucide-react/dist/esm/icons/cpu';
 import { motion, AnimatePresence } from 'motion/react';
 
 export type ToastType = 'success' | 'warning' | 'error' | 'info' | 'system';
@@ -56,7 +60,7 @@ const actionColorMap: Record<ToastType, string> = {
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   return (
-    <div className="fixed top-4 right-4 z-[9990] flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm">
+    <div className="fixed top-4 right-4 z-[9990] flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm" aria-live="polite" aria-relevant="additions removals">
       <AnimatePresence>
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
@@ -98,6 +102,7 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
       exit={{ opacity: 0, x: 60, scale: 0.9 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={`pointer-events-auto flex flex-col rounded-lg border backdrop-blur-md shadow-lg overflow-hidden ${bgMap[toast.type]}`}
+      role="alert"
     >
       <div className="flex items-start gap-2 p-2.5">
         {toast.type === 'system' && (
@@ -118,6 +123,7 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
                 dismiss();
               }}
               className={`text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded border transition-all cursor-pointer ${actionColorMap[toast.type]}`}
+              aria-label={toast.action.label}
             >
               {toast.action.label}
             </button>
@@ -125,8 +131,9 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
           <button
             onClick={dismiss}
             className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer relative z-10"
+            aria-label="Tutup notifikasi"
           >
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3" aria-hidden="true" />
           </button>
         </div>
       </div>

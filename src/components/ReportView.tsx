@@ -1,6 +1,17 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { IncidentReport, Regulation, ReportType } from '../types';
-import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2, Copy, Search, X as XIcon } from 'lucide-react';
+import Clock from 'lucide-react/dist/esm/icons/clock';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import Printer from 'lucide-react/dist/esm/icons/printer';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle';
+import Car from 'lucide-react/dist/esm/icons/car';
+import ShieldAlert from 'lucide-react/dist/esm/icons/shield-alert';
+import Share2 from 'lucide-react/dist/esm/icons/share-2';
+import Copy from 'lucide-react/dist/esm/icons/copy';
+import Search from 'lucide-react/dist/esm/icons/search';
+import XIcon from 'lucide-react/dist/esm/icons/x';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ReportViewProps {
@@ -234,22 +245,25 @@ export const ReportView: React.FC<ReportViewProps> = ({
               onClick={() => handleCopyASCII(rep)}
               className="p-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 rounded transition-colors cursor-pointer"
               title="Salin Laporan ASCII (Discord)"
+              aria-label={`Salin laporan ${rep.citizenName} ke clipboard`}
             >
-              <Copy className="w-3 h-3" />
+              <Copy className="w-3 h-3" aria-hidden="true" />
             </button>
             <button
               onClick={() => setInvoiceReport(rep)}
               className="p-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 hover:border-cyan-500/40 rounded transition-colors cursor-pointer"
               title="Lihat Invoice"
+              aria-label={`Lihat invoice ${rep.citizenName}`}
             >
-              <FileText className="w-3 h-3" />
+              <FileText className="w-3 h-3" aria-hidden="true" />
             </button>
             <button
               onClick={() => handleDeleteWithUndo(rep)}
               className="p-1 hover:bg-red-500/15 text-red-400 rounded transition-colors cursor-pointer"
               title="Hapus Laporan"
+              aria-label={`Hapus laporan ${rep.citizenName}`}
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-3 h-3" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -260,10 +274,13 @@ export const ReportView: React.FC<ReportViewProps> = ({
   return (
     <div className="flex flex-col">
       {/* Tab Switcher */}
-      <div className="flex gap-1.5 mb-3 shrink-0">
+      <div className="flex gap-1.5 mb-3 shrink-0" role="tablist" aria-label="Jenis laporan">
         <button
           onClick={() => setActiveReportTab('kriminal')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer ${
+          role="tab"
+          aria-selected={activeReportTab === 'kriminal'}
+          aria-controls="report-panel-kriminal"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-1 focus:ring-offset-slate-950 ${
             activeReportTab === 'kriminal'
               ? 'bg-cyan-950/40 border-cyan-400 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.15)]'
               : 'bg-slate-900/40 border-cyan-950 text-slate-500 hover:border-cyan-900 hover:text-slate-400'
@@ -277,7 +294,10 @@ export const ReportView: React.FC<ReportViewProps> = ({
         </button>
         <button
           onClick={() => setActiveReportTab('lalu_lintas')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer ${
+          role="tab"
+          aria-selected={activeReportTab === 'lalu_lintas'}
+          aria-controls="report-panel-lalu_lintas"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-bold uppercase tracking-wider border transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 focus:ring-offset-slate-950 ${
             activeReportTab === 'lalu_lintas'
               ? 'bg-amber-950/30 border-amber-400 text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.15)]'
               : 'bg-slate-900/40 border-cyan-950 text-slate-500 hover:border-amber-900 hover:text-slate-400'
@@ -331,7 +351,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
       </h2>
 
       {/* Report List */}
-      <div className="flex-1 overflow-y-auto space-y-2 pr-1 compact-scrollbar">
+      <div id={`report-panel-${activeReportTab}`} role="tabpanel" aria-label={activeReportTab === 'kriminal' ? 'Laporan kriminal' : 'Laporan lalu lintas'} className="flex-1 overflow-y-auto space-y-2 pr-1 compact-scrollbar">
         {filteredReports.length === 0 ? (
           <div className="text-center py-16 text-slate-500 font-sans">
             <AlertTriangle className="w-8 h-8 mx-auto mb-2 opacity-30 text-cyan-400" />

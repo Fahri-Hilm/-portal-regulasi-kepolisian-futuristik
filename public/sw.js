@@ -3,7 +3,6 @@ const CACHE_NAME = 'portal-regulasi-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/src/main.tsx',
 ];
 
 // Install event - cache static assets

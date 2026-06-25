@@ -76,8 +76,8 @@ export async function preloadCriticalAssets() {
   try {
     const cache = await caches.open('portal-regulasi-v1');
     const criticalAssets = [
+      '/',
       '/index.html',
-      '/src/main.tsx',
     ];
 
     for (const asset of criticalAssets) {

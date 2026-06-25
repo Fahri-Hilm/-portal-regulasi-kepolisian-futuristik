@@ -1,10 +1,23 @@
 import React, { useState, useMemo, useRef } from 'react';
-import {
-  BookOpen, ShieldAlert, ClipboardList, FileText, LayoutDashboard,
-  Search, AlertTriangle, CheckCircle, Info, Zap, Lock,
-  ArrowRight, Monitor, Trash2, Edit2, Printer, RefreshCw,
-  TrendingUp, X
-} from 'lucide-react';
+import BookOpen from 'lucide-react/dist/esm/icons/book-open';
+import ShieldAlert from 'lucide-react/dist/esm/icons/shield-alert';
+import ClipboardList from 'lucide-react/dist/esm/icons/clipboard-list';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import LayoutDashboard from 'lucide-react/dist/esm/icons/layout-dashboard';
+import Search from 'lucide-react/dist/esm/icons/search';
+import AlertTriangle from 'lucide-react/dist/esm/icons/alert-triangle';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+import Info from 'lucide-react/dist/esm/icons/info';
+import Zap from 'lucide-react/dist/esm/icons/zap';
+import Lock from 'lucide-react/dist/esm/icons/lock';
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+import Monitor from 'lucide-react/dist/esm/icons/monitor';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import Edit2 from 'lucide-react/dist/esm/icons/edit-2';
+import Printer from 'lucide-react/dist/esm/icons/printer';
+import RefreshCw from 'lucide-react/dist/esm/icons/refresh-cw';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
+import X from 'lucide-react/dist/esm/icons/x';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface DocItem {

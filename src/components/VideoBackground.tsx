@@ -4,9 +4,10 @@ import { useAdaptivePerformance } from '../contexts/AdaptivePerformanceContext';
 interface VideoBackgroundProps {
   src: string;
   fallbackColor?: string;
+  'aria-hidden'?: boolean | 'true' | 'false';
 }
 
-export function VideoBackground({ src, fallbackColor = '#000000' }: VideoBackgroundProps) {
+export function VideoBackground({ src, fallbackColor = '#000000', 'aria-hidden': ariaHidden }: VideoBackgroundProps) {
   const { config, tier, isLowEnd } = useAdaptivePerformance();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -56,10 +57,14 @@ export function VideoBackground({ src, fallbackColor = '#000000' }: VideoBackgro
     video.addEventListener('error', handleError);
     video.addEventListener('loadstart', handleLoadStart);
 
-    // Start loading based on device tier
+    // Defer video load until after first paint to improve FCP/LCP
+    const loadVideo = () => video.load();
     if (config.lazyLoadVideo === false) {
-      // High-end: load immediately
-      video.load();
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(loadVideo, { timeout: 2000 });
+      } else {
+        setTimeout(loadVideo, 150);
+      }
     }
 
     return () => {
@@ -98,6 +103,7 @@ export function VideoBackground({ src, fallbackColor = '#000000' }: VideoBackgro
       <div
         className="absolute inset-0 w-full h-full"
         style={{ backgroundColor: fallbackColor }}
+        aria-hidden={ariaHidden}
       />
     );
   }
@@ -124,6 +130,7 @@ export function VideoBackground({ src, fallbackColor = '#000000' }: VideoBackgro
         muted
         loop
         playsInline
+        aria-hidden={ariaHidden}
       >
         {/* Primary source: quality-specific */}
         <source src={videoSource} type="video/mp4" />

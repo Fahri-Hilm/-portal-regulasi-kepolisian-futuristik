@@ -10,10 +10,12 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          motion: ['motion'],
-          supabase: ['@supabase/supabase-js'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom/')) return 'vendor';
+          if (id.includes('node_modules/react/') && !id.includes('react-dom')) return 'vendor';
+          if (id.includes('node_modules/motion/') || id.includes('node_modules/framer-motion/')) return 'motion';
+          if (id.includes('node_modules/@supabase/')) return 'supabase';
+          if (id.includes('node_modules/lucide-react/')) return 'icons';
         },
       },
     },

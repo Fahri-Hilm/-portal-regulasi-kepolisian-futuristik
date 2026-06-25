@@ -1,6 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Regulation, RegulationCategory, IncidentReport } from '../types';
-import { Plus, Edit2, Trash2, X, PieChart, BarChart3, Database, Save, FileText, TrendingUp } from 'lucide-react';
+import Plus from 'lucide-react/dist/esm/icons/plus';
+import Edit2 from 'lucide-react/dist/esm/icons/edit-2';
+import Trash2 from 'lucide-react/dist/esm/icons/trash-2';
+import X from 'lucide-react/dist/esm/icons/x';
+import PieChart from 'lucide-react/dist/esm/icons/pie-chart';
+import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3';
+import Database from 'lucide-react/dist/esm/icons/database';
+import Save from 'lucide-react/dist/esm/icons/save';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface DashboardViewProps {
@@ -562,11 +571,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </td>
                     <td className="px-2 sm:px-3 py-1.5">
                       <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => handleOpenEditModal(reg)} className="p-1 hover:bg-cyan-500/10 text-cyan-400 rounded transition-colors cursor-pointer" title="Edit">
-                          <Edit2 className="w-3 h-3" />
+                        <button onClick={() => handleOpenEditModal(reg)} className="p-1 hover:bg-cyan-500/10 text-cyan-400 rounded transition-colors cursor-pointer" title="Edit" aria-label={`Edit regulasi ${reg.code}`}>
+                          <Edit2 className="w-3 h-3" aria-hidden="true" />
                         </button>
-                        <button onClick={() => onDeleteRegulation(reg.id)} className="p-1 hover:bg-red-500/10 text-red-400 rounded transition-colors cursor-pointer" title="Hapus">
-                          <Trash2 className="w-3 h-3" />
+                        <button onClick={() => onDeleteRegulation(reg.id)} className="p-1 hover:bg-red-500/10 text-red-400 rounded transition-colors cursor-pointer" title="Hapus" aria-label={`Hapus regulasi ${reg.code}`}>
+                          <Trash2 className="w-3 h-3" aria-hidden="true" />
                         </button>
                       </div>
                     </td>
@@ -581,13 +590,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="dashboard-modal-title">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
               className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+              aria-hidden="true"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -597,12 +607,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-cyan-500 via-cyan-300 to-cyan-500" />
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-cyan-400 font-display font-bold text-[10px] sm:text-xs tracking-widest uppercase flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5" />
+                <h3 id="dashboard-modal-title" className="text-cyan-400 font-display font-bold text-[10px] sm:text-xs tracking-widest uppercase flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" aria-hidden="true" />
                   {editingRegulation ? 'EDIT DATA REGULASI' : 'FORM INPUT DATA REGULASI'}
                 </h3>
-                <button onClick={() => setIsModalOpen(false)} className="p-0.5 text-slate-500 hover:text-slate-200 rounded-full hover:bg-slate-900 transition-colors cursor-pointer">
-                  <X className="w-4 h-4" />
+                <button onClick={() => setIsModalOpen(false)} className="p-0.5 text-slate-500 hover:text-slate-200 rounded-full hover:bg-slate-900 transition-colors cursor-pointer" aria-label="Tutup formulir">
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
 
