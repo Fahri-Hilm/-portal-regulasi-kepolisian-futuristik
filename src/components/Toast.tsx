@@ -4,11 +4,17 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export type ToastType = 'success' | 'warning' | 'error' | 'info' | 'system';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface Toast {
   id: string;
   message: string;
   type: ToastType;
   duration?: number;
+  action?: ToastAction;
 }
 
 interface ToastContainerProps {
@@ -40,6 +46,14 @@ const textMap: Record<ToastType, string> = {
   system: 'text-cyan-400 font-mono tracking-wide text-[10px] leading-relaxed relative z-10',
 };
 
+const actionColorMap: Record<ToastType, string> = {
+  success: 'text-emerald-300 hover:text-emerald-200 border-emerald-500/40 hover:border-emerald-400/60 hover:bg-emerald-500/10',
+  warning: 'text-amber-300 hover:text-amber-200 border-amber-500/40 hover:border-amber-400/60 hover:bg-amber-500/10',
+  error: 'text-red-300 hover:text-red-200 border-red-500/40 hover:border-red-400/60 hover:bg-red-500/10',
+  info: 'text-cyan-300 hover:text-cyan-200 border-cyan-500/40 hover:border-cyan-400/60 hover:bg-cyan-500/10',
+  system: 'text-cyan-300 hover:text-cyan-200 border-cyan-500/40 hover:border-cyan-400/60 hover:bg-cyan-500/10 relative z-10',
+};
+
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
   return (
     <div className="fixed top-4 right-4 z-[9990] flex flex-col gap-2 pointer-events-none max-w-xs sm:max-w-sm">
@@ -55,6 +69,11 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove
 const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {
   const [isExiting, setIsExiting] = useState(false);
   const duration = toast.duration || 3000;
+
+  const dismiss = () => {
+    setIsExiting(true);
+    setTimeout(() => onRemove(toast.id), 300);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -90,15 +109,26 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
         <span className={`flex-1 ${textMap[toast.type]} ${toast.type !== 'system' ? 'text-[11px] font-sans' : ''}`}>
           {toast.message}
         </span>
-        <button
-          onClick={() => {
-            setIsExiting(true);
-            setTimeout(() => onRemove(toast.id), 300);
-          }}
-          className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer shrink-0 relative z-10"
-        >
-          <X className="w-3 h-3" />
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Action button (e.g. BATAL for undo delete) */}
+          {toast.action && (
+            <button
+              onClick={() => {
+                toast.action!.onClick();
+                dismiss();
+              }}
+              className={`text-[10px] font-display font-bold uppercase tracking-wider px-2 py-0.5 rounded border transition-all cursor-pointer ${actionColorMap[toast.type]}`}
+            >
+              {toast.action.label}
+            </button>
+          )}
+          <button
+            onClick={dismiss}
+            className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer relative z-10"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
       </div>
       {/* Progress bar */}
       <div className="w-full h-[2px] bg-transparent">
@@ -112,4 +142,3 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
     </motion.div>
   );
 };
-

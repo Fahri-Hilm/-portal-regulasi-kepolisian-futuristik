@@ -166,7 +166,24 @@ Portal Regulasi Kepolisian (React 19 + TypeScript)
 
 ## 🔄 Riwayat Pembaruan (Changelog)
 
-### v1.1.0 — 2026-06-25 *(Terbaru)*
+### v1.2.0 — 2026-06-25 *(Terbaru)*
+
+#### 📱 Android-First Improvements
+- **[BARU]** **Undo Hapus Laporan** — Klik hapus menampilkan toast `BATAL` selama 5 detik, pencegah salah klik di HP
+- **[BARU]** **Badge Counter di Nav** — Angka merah pada ikon Laporan menampilkan jumlah laporan yang dibuat hari ini (real-time)
+- **[FIX]** **Tombol Back Android** — Menggunakan History API (`pushState`/`popstate`) agar back kembali ke tab sebelumnya, bukan keluar browser
+
+#### 🔔 Notifikasi Interaktif
+- **[BARU]** Toast kini mendukung **tombol aksi inline** (contoh: tombol `BATAL` berwarna sesuai tipe toast)
+- **[PENINGKATAN]** Progress bar toast dengan warna dinamis per tipe notifikasi
+
+#### 🔍 UX Laporan
+- **[BARU]** Pencarian real-time di tab Laporan — cari nama, ID, atau kode pasal
+- **[BARU]** Pull-to-refresh — tarik layar untuk sinkronisasi ulang data dari Supabase
+
+---
+
+### v1.1.0 — 2026-06-25
 
 #### 🎯 Toast Notifikasi Bertema Sci-Fi
 - **[BARU]** Tipe toast `system` dengan desain cyberpunk unik (shimmer, neon glow, font mono)

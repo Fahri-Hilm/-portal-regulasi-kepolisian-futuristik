@@ -118,9 +118,13 @@ function AppContent() {
 
   // Toast system
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
+  const addToast = useCallback((
+    message: string,
+    type: Toast['type'] = 'info',
+    action?: Toast['action']
+  ) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type, action }]);
     
     // Trigger haptic feedback based on toast type
     if (type === 'success') {
@@ -354,11 +358,17 @@ function AppContent() {
     }
   };
 
+  // Badge counter — laporan yang dibuat hari ini
+  const todayReportCount = useMemo(() => {
+    const today = new Date().toDateString();
+    return reports.filter((r) => new Date(r.timestamp).toDateString() === today).length;
+  }, [reports]);
+
   const navItems = [
-    { id: 'dashboard' as const, label: 'Dashboard', icon: LayoutDashboard, onClick: handleDashboardTabClick, isActive: activeTab === 'dashboard' && isDashboardUnlocked },
-    { id: 'regulasi' as const, label: 'Regulasi', icon: BookOpen, onClick: () => navigateTo('regulasi'), isActive: activeTab === 'regulasi' },
-    { id: 'laporan' as const, label: 'Laporan', icon: FileSpreadsheet, onClick: () => navigateTo('laporan'), isActive: activeTab === 'laporan' },
-    { id: 'dokumentasi' as const, label: 'Dokumentasi', icon: HelpCircle, onClick: () => navigateTo('dokumentasi'), isActive: activeTab === 'dokumentasi' },
+    { id: 'dashboard' as const, label: 'Dashboard', icon: LayoutDashboard, onClick: handleDashboardTabClick, isActive: activeTab === 'dashboard' && isDashboardUnlocked, badge: 0 },
+    { id: 'regulasi' as const, label: 'Regulasi', icon: BookOpen, onClick: () => navigateTo('regulasi'), isActive: activeTab === 'regulasi', badge: 0 },
+    { id: 'laporan' as const, label: 'Laporan', icon: FileSpreadsheet, onClick: () => navigateTo('laporan'), isActive: activeTab === 'laporan', badge: todayReportCount },
+    { id: 'dokumentasi' as const, label: 'Dokumentasi', icon: HelpCircle, onClick: () => navigateTo('dokumentasi'), isActive: activeTab === 'dokumentasi', badge: 0 },
   ];
 
   return (
@@ -717,7 +727,16 @@ function AppContent() {
                     : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-900/60'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 relative z-10 transition-transform group-hover:scale-110 ${item.isActive ? 'text-slate-950' : ''}`} />
+                <div className="relative">
+                  <item.icon className={`w-4 h-4 shrink-0 relative z-10 transition-transform group-hover:scale-110 ${item.isActive ? 'text-slate-950' : ''}`} />
+                  {item.badge > 0 && (
+                    <span className={`absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] flex items-center justify-center rounded-full text-[8px] font-bold px-0.5 z-20 ${
+                      item.isActive ? 'bg-slate-950 text-cyan-400' : 'bg-red-500 text-white'
+                    }`}>
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
                 <span className="relative z-10">{item.label}</span>
                 {item.isActive && (
                   <motion.div layoutId="desktop-active-tab" className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-cyan-300 z-0" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
@@ -738,7 +757,14 @@ function AppContent() {
                     : 'text-slate-400 active:text-cyan-400'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 transition-transform ${item.isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] -translate-y-0.5' : 'text-slate-400'}`} />
+                <div className="relative">
+                  <item.icon className={`w-4 h-4 shrink-0 transition-transform ${item.isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] -translate-y-0.5' : 'text-slate-400'}`} />
+                  {item.badge > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] flex items-center justify-center rounded-full text-[8px] font-bold px-0.5 bg-red-500 text-white z-10 shadow-[0_0_6px_rgba(239,68,68,0.6)]">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
                 <span className={`truncate max-w-[60px] transition-all ${item.isActive ? 'opacity-100' : 'opacity-70'}`}>{item.label}</span>
                 {item.isActive && (
                   <motion.div layoutId="mobile-active-tab" className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.8)]" transition={{ type: "spring", stiffness: 400, damping: 35 }} />

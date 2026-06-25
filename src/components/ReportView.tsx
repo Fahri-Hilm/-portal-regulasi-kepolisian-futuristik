@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { IncidentReport, Regulation, ReportType } from '../types';
 import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2, Copy, Search, X as XIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -19,6 +19,40 @@ export const ReportView: React.FC<ReportViewProps> = ({
   const [activeReportTab, setActiveReportTab] = useState<ReportType>('kriminal');
   const [invoiceReport, setInvoiceReport] = useState<IncidentReport | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Undo delete: map of reportId -> setTimeout handle
+  const pendingDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  const handleDeleteWithUndo = (rep: IncidentReport) => {
+    if (navigator.vibrate) navigator.vibrate([20, 30, 20]);
+
+    // Cancel any existing pending delete for this ID (safety)
+    const existing = pendingDeletes.current.get(rep.id);
+    if (existing) clearTimeout(existing);
+
+    const timeoutId = setTimeout(() => {
+      onDeleteReport(rep.id);
+      pendingDeletes.current.delete(rep.id);
+    }, 5000);
+
+    pendingDeletes.current.set(rep.id, timeoutId);
+
+    addToast(
+      `Laporan ${rep.citizenName} akan dihapus...`,
+      'warning',
+      {
+        label: 'BATAL',
+        onClick: () => {
+          const tid = pendingDeletes.current.get(rep.id);
+          if (tid) {
+            clearTimeout(tid);
+            pendingDeletes.current.delete(rep.id);
+            addToast(`[↩] Penghapusan laporan ${rep.citizenName} dibatalkan`, 'info');
+          }
+        },
+      }
+    );
+  };
 
   const filteredReports = useMemo(() => {
     let results = reports.filter((r) => r.type === activeReportTab);
@@ -211,7 +245,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
               <FileText className="w-3 h-3" />
             </button>
             <button
-              onClick={() => onDeleteReport(rep.id)}
+              onClick={() => handleDeleteWithUndo(rep)}
               className="p-1 hover:bg-red-500/15 text-red-400 rounded transition-colors cursor-pointer"
               title="Hapus Laporan"
             >
