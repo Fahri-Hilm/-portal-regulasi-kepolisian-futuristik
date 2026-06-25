@@ -56,6 +56,13 @@ export const ReportView: React.FC<ReportViewProps> = ({
       : '       🚔  LAPORAN KRIMINAL KOTA  🚔       ';
     const labelSuspect = isTraffic ? 'Pelanggar' : 'Tersangka';
 
+    // Traffic: denda saja. Criminal: denda + masa tahanan menonjol
+    const summaryBlock = isTraffic
+      ? `Total Denda: ${formatCurrency(rep.totalFine)}\n`
+      : `Total Denda   : ${formatCurrency(rep.totalFine)}\n` +
+        `-------------------------------------------\n` +
+        `⛓  MASA TAHANAN  : ${rep.totalJailTime} BULAN\n`;
+
     const shareText = 
       `\`\`\`text\n` +
       `===========================================\n` +
@@ -69,8 +76,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
       `-------------------------------------------\n` +
       `Rincian Pasal:\n${articleCodes}\n` +
       `-------------------------------------------\n` +
-      `Total Denda: ${formatCurrency(rep.totalFine)}\n` +
-      `Kurungan: ${rep.totalJailTime} Bulan\n` +
+      `${summaryBlock}` +
       `-------------------------------------------\n` +
       `     DEPARTEMEN KEPOLISIAN FUTURISTIK      \n` +
       `===========================================\n` +
