@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense, lazy, memo, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy, memo, useMemo } from 'react';
 import { Regulation, IncidentReport } from './types';
 import { INITIAL_REGULATIONS, INITIAL_REPORTS } from './data';
 import { Logo } from './components/Logo';
@@ -138,14 +138,52 @@ function AppContent() {
   }, []);
 
   // Load data from Supabase on mount (with localStorage fallback)
-  useEffect(() => {
-    async function loadData() {
-      const [regs, reps] = await Promise.all([fetchRegulations(), fetchReports()]);
-      setRegulations(regs);
-      setReports(reps);
-    }
-    loadData();
+  const refreshData = useCallback(async () => {
+    const [regs, reps] = await Promise.all([fetchRegulations(), fetchReports()]);
+    setRegulations(regs);
+    setReports(reps);
   }, []);
+
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
+
+  // Pull-to-refresh state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const PULL_THRESHOLD = 80;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const el = mainRef.current;
+    if (el && el.scrollTop <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = true;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling.current) return;
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) {
+      setPullDistance(Math.min(diff * 0.4, 120));
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (!isPulling.current) return;
+    isPulling.current = false;
+    if (pullDistance >= PULL_THRESHOLD && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(50);
+      await refreshData();
+      addToast('[🔄] DATA DISINKRONISASI DARI SERVER', 'info');
+      setIsRefreshing(false);
+    }
+    setPullDistance(0);
+  }, [pullDistance, isRefreshing, refreshData, addToast]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -423,8 +461,28 @@ function AppContent() {
             {/* Desktop Sidebar Nav removed - Replaced by Floating Dock below */}
 
             {/* Main Content */}
-            <main className="flex-1 bg-slate-900/20 border border-cyan-950/50 rounded-xl p-2.5 sm:p-3 relative shadow-inner overflow-y-auto overflow-x-hidden min-h-0 compact-scrollbar lg:pb-0 pb-[72px]">
+            <main
+              ref={mainRef}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="flex-1 bg-slate-900/20 border border-cyan-950/50 rounded-xl p-2.5 sm:p-3 relative shadow-inner overflow-y-auto overflow-x-hidden min-h-0 compact-scrollbar lg:pb-0 pb-[72px]"
+            >
               <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
+
+              {/* Pull-to-refresh indicator */}
+              {(pullDistance > 5 || isRefreshing) && (
+                <div
+                  className="flex items-center justify-center transition-all duration-150 overflow-hidden"
+                  style={{ height: `${isRefreshing ? 40 : pullDistance * 0.5}px` }}
+                >
+                  <div className={`flex items-center gap-2 text-cyan-400 text-[10px] font-mono tracking-wider uppercase ${isRefreshing ? 'animate-pulse' : ''}`}>
+                    <div className={`w-4 h-4 border-2 border-cyan-500/40 border-t-cyan-400 rounded-full ${isRefreshing ? 'animate-spin' : ''}`}
+                         style={{ transform: !isRefreshing ? `rotate(${pullDistance * 3}deg)` : undefined }} />
+                    {isRefreshing ? 'SINKRONISASI...' : pullDistance >= PULL_THRESHOLD ? 'LEPAS UNTUK REFRESH' : 'TARIK UNTUK REFRESH'}
+                  </div>
+                </div>
+              )}
 
               {/* LANDING PAGE */}
               {activeTab === null && (

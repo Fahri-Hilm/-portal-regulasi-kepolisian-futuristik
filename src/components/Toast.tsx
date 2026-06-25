@@ -54,14 +54,23 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove
 
 const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({ toast, onRemove }) => {
   const [isExiting, setIsExiting] = useState(false);
+  const duration = toast.duration || 3000;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => onRemove(toast.id), 300);
-    }, toast.duration || 3000);
+    }, duration);
     return () => clearTimeout(timer);
-  }, [toast.id, toast.duration, onRemove]);
+  }, [toast.id, duration, onRemove]);
+
+  const progressColorMap: Record<ToastType, string> = {
+    success: 'bg-emerald-400',
+    warning: 'bg-amber-400',
+    error: 'bg-red-400',
+    info: 'bg-cyan-400',
+    system: 'bg-cyan-400',
+  };
 
   return (
     <motion.div
@@ -69,26 +78,38 @@ const ToastItem: React.FC<{ toast: Toast; onRemove: (id: string) => void }> = ({
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 60, scale: 0.9 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`pointer-events-auto flex items-start gap-2 p-2.5 rounded-lg border backdrop-blur-md shadow-lg ${bgMap[toast.type]}`}
+      className={`pointer-events-auto flex flex-col rounded-lg border backdrop-blur-md shadow-lg overflow-hidden ${bgMap[toast.type]}`}
     >
-      {toast.type === 'system' && (
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent pointer-events-none rounded-lg overflow-hidden">
-          <div className="absolute inset-0 shimmer opacity-25" />
-        </div>
-      )}
-      {iconMap[toast.type]}
-      <span className={`flex-1 ${textMap[toast.type]} ${toast.type !== 'system' ? 'text-[11px] font-sans' : ''}`}>
-        {toast.message}
-      </span>
-      <button
-        onClick={() => {
-          setIsExiting(true);
-          setTimeout(() => onRemove(toast.id), 300);
-        }}
-        className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer shrink-0 relative z-10"
-      >
-        <X className="w-3 h-3" />
-      </button>
+      <div className="flex items-start gap-2 p-2.5">
+        {toast.type === 'system' && (
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-transparent pointer-events-none rounded-lg overflow-hidden">
+            <div className="absolute inset-0 shimmer opacity-25" />
+          </div>
+        )}
+        {iconMap[toast.type]}
+        <span className={`flex-1 ${textMap[toast.type]} ${toast.type !== 'system' ? 'text-[11px] font-sans' : ''}`}>
+          {toast.message}
+        </span>
+        <button
+          onClick={() => {
+            setIsExiting(true);
+            setTimeout(() => onRemove(toast.id), 300);
+          }}
+          className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer shrink-0 relative z-10"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+      {/* Progress bar */}
+      <div className="w-full h-[2px] bg-transparent">
+        <div
+          className={`h-full ${progressColorMap[toast.type]} opacity-60`}
+          style={{
+            animation: `toast-progress ${duration}ms linear forwards`,
+          }}
+        />
+      </div>
     </motion.div>
   );
 };
+

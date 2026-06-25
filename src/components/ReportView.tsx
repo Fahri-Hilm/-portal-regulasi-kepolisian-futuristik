@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { IncidentReport, Regulation, ReportType } from '../types';
-import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2, Copy } from 'lucide-react';
+import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2, Copy, Search, X as XIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ReportViewProps {
@@ -18,11 +18,23 @@ export const ReportView: React.FC<ReportViewProps> = ({
 }) => {
   const [activeReportTab, setActiveReportTab] = useState<ReportType>('kriminal');
   const [invoiceReport, setInvoiceReport] = useState<IncidentReport | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredReports = useMemo(
-    () => reports.filter((r) => r.type === activeReportTab),
-    [reports, activeReportTab]
-  );
+  const filteredReports = useMemo(() => {
+    let results = reports.filter((r) => r.type === activeReportTab);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      results = results.filter((r) =>
+        r.citizenName.toLowerCase().includes(q) ||
+        r.id.toLowerCase().includes(q) ||
+        r.articles.some((aid) => {
+          const reg = regulations.find((rg) => rg.id === aid);
+          return reg ? reg.code.toLowerCase().includes(q) : false;
+        })
+      );
+    }
+    return results;
+  }, [reports, activeReportTab, searchQuery, regulations]);
 
   const trafficRepeatOffenders = useMemo(() => {
     const trafficReports = reports.filter((r) => r.type === 'lalu_lintas');
@@ -245,6 +257,26 @@ export const ReportView: React.FC<ReportViewProps> = ({
         </button>
       </div>
 
+      {/* Search Bar */}
+      <div className="relative mb-2 shrink-0">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cyan-500/50 pointer-events-none" />
+        <input
+          type="text"
+          placeholder="Cari nama, ID, atau kode pasal..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-slate-900/60 border border-cyan-950/60 rounded-lg py-2 pl-8 pr-8 text-slate-200 text-[11px] font-sans placeholder-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
+          >
+            <XIcon className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+
       {/* Header */}
       <h2 className="text-slate-200 font-display font-bold text-xs tracking-widest uppercase mb-2 flex items-center gap-1.5 shrink-0">
         {activeReportTab === 'kriminal' ? (
@@ -260,6 +292,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
         )}
         <span className="text-[9px] font-mono text-cyan-400/70 bg-cyan-500/5 px-1.5 py-0.5 rounded border border-cyan-500/10 ml-auto">
           {filteredReports.length} Laporan
+          {searchQuery.trim() && ` (filter)`}
         </span>
       </h2>
 

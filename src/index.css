@@ -260,6 +260,12 @@ select option {
   animation: toast-out 0.3s ease-in forwards;
 }
 
+/* Toast progress bar */
+@keyframes toast-progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
 /* Responsive grid helpers */
 @media (max-width: 640px) {
   .cyber-grid {
