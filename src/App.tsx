@@ -171,6 +171,19 @@ function AppContent() {
     localStorage.setItem('pkr_calculator', JSON.stringify(selectedRegulations));
   }, [selectedRegulations]);
 
+  // Listen for Service Worker updates
+  useEffect(() => {
+    const handleUpdate = (e: any) => {
+      if (window.confirm('VERSI SISTEM BARU TERSEDIA!\n\nSistem telah mengunduh pembaruan di latar belakang. Klik OK untuk memuat ulang dan mengaktifkan fitur terbaru.')) {
+        if (e.detail && typeof e.detail.update === 'function') {
+          e.detail.update();
+        }
+      }
+    };
+    window.addEventListener('pkr-update-available', handleUpdate);
+    return () => window.removeEventListener('pkr-update-available', handleUpdate);
+  }, []);
+
   const handleAddRegulation = async (newReg: Regulation) => {
     setRegulations((prev) => [newReg, ...prev]);
     await insertRegulation(newReg);
@@ -400,36 +413,7 @@ function AppContent() {
 
           {/* Content Area */}
           <div className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-3 py-2 flex flex-col lg:flex-row gap-2 sm:gap-3 items-stretch min-h-0">
-            {/* Desktop Sidebar Nav */}
-            <nav className="hidden lg:flex flex-col gap-1 w-44 shrink-0">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={item.onClick}
-                  className={`flex items-center gap-2 py-2 px-3 rounded-lg font-display font-bold text-[10px] uppercase tracking-widest transition-all duration-200 cursor-pointer ${
-                    item.isActive
-                      ? 'bg-cyan-950/40 border border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] pulse-glow'
-                      : 'text-slate-400 border border-transparent hover:text-slate-200 hover:bg-slate-900/30 hover:border-cyan-950/40'
-                  }`}
-                >
-                  <item.icon className="w-3.5 h-3.5 shrink-0" />
-                  {item.label}
-                </button>
-              ))}
-
-              <div className="h-px bg-cyan-950/40 my-2" />
-
-              {/* Tips Cepat */}
-              <div className="bg-slate-950/60 border border-cyan-950/40 rounded-lg p-2.5 mt-auto">
-                <p className="text-cyan-400 font-display font-bold text-[9px] uppercase tracking-widest mb-1.5">Tips Cepat</p>
-                <div className="space-y-1.5 text-[8px] sm:text-[9px] text-slate-500 font-sans leading-relaxed">
-                  <p>1. Buka <span className="text-cyan-400">Regulasi</span> → pilih pasal</p>
-                  <p>2. Klik <span className="text-cyan-400">Tambah</span> ke kalkulator</p>
-                  <p>3. <span className="text-cyan-400">Konfirmasi</span> → masukkan nama</p>
-                  <p>4. Laporan otomatis tersimpan</p>
-                </div>
-              </div>
-            </nav>
+            {/* Desktop Sidebar Nav removed - Replaced by Floating Dock below */}
 
             {/* Main Content */}
             <main className="flex-1 bg-slate-900/20 border border-cyan-950/50 rounded-xl p-2.5 sm:p-3 relative shadow-inner overflow-y-auto overflow-x-hidden min-h-0 compact-scrollbar lg:pb-0 pb-[72px]">
@@ -516,7 +500,21 @@ function AppContent() {
                   transition={{ duration: config.enableAnimations ? 0.15 : 0, ease: 'easeOut' }}
                   className="h-full"
                 >
-                  <Suspense fallback={<div className="flex items-center justify-center h-full"><span className="text-cyan-400 text-xs font-mono animate-pulse">MEMUAT...</span></div>}>
+                  <Suspense fallback={
+                    <div className="flex flex-col items-center justify-center h-full gap-4 opacity-50">
+                      <div className="relative w-32 h-32 flex items-center justify-center">
+                        <div className="absolute inset-0 border-2 border-cyan-500/20 rounded-full animate-ping" />
+                        <div className="absolute inset-4 border-2 border-t-cyan-400 border-r-transparent border-b-cyan-500/40 border-l-transparent rounded-full animate-spin" />
+                        <ShieldAlert className="w-8 h-8 text-cyan-500/50 animate-pulse" />
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-cyan-400 text-[10px] font-display font-bold tracking-[0.3em] uppercase animate-pulse">DECRYPTING MODULE...</span>
+                        <div className="w-24 h-0.5 bg-slate-800 rounded overflow-hidden">
+                          <div className="h-full bg-cyan-400 animate-pulse" style={{ width: '60%' }} />
+                        </div>
+                      </div>
+                    </div>
+                  }>
                   {activeTab === 'dashboard' && isDashboardUnlocked && (
                     <DashboardView
                       regulations={regulations}
@@ -619,6 +617,27 @@ function AppContent() {
             </div>
           </footer>
 
+          {/* Desktop Floating Dock */}
+          <nav className="hidden lg:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-50 items-center gap-2 p-2 bg-slate-950/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl shadow-[0_10px_40px_-10px_rgba(6,182,212,0.3)]">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={item.onClick}
+                className={`relative flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl font-display font-bold text-[11px] uppercase tracking-widest transition-all duration-300 cursor-pointer overflow-hidden group ${
+                  item.isActive
+                    ? 'text-slate-950 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+                    : 'text-slate-400 hover:text-cyan-300 hover:bg-slate-900/60'
+                }`}
+              >
+                <item.icon className={`w-4 h-4 shrink-0 relative z-10 transition-transform group-hover:scale-110 ${item.isActive ? 'text-slate-950' : ''}`} />
+                <span className="relative z-10">{item.label}</span>
+                {item.isActive && (
+                  <motion.div layoutId="desktop-active-tab" className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-cyan-300 z-0" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
+                )}
+              </button>
+            ))}
+          </nav>
+
           {/* Mobile Bottom Nav - Compact & Efficient */}
           <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch border-t border-cyan-950/60 bg-slate-950/95 backdrop-blur-md shrink-0 pb-[env(safe-area-inset-bottom)]">
             {navItems.map((item) => (
@@ -631,10 +650,10 @@ function AppContent() {
                     : 'text-slate-400 active:text-cyan-400'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 ${item.isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'text-slate-400'}`} />
-                <span className="truncate max-w-[60px]">{item.label}</span>
+                <item.icon className={`w-4 h-4 shrink-0 transition-transform ${item.isActive ? 'text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] -translate-y-0.5' : 'text-slate-400'}`} />
+                <span className={`truncate max-w-[60px] transition-all ${item.isActive ? 'opacity-100' : 'opacity-70'}`}>{item.label}</span>
                 {item.isActive && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+                  <motion.div layoutId="mobile-active-tab" className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.8)]" transition={{ type: "spring", stiffness: 400, damping: 35 }} />
                 )}
               </button>
             ))}

@@ -45,17 +45,25 @@ export function registerServiceWorker() {
 
     // Listen for controller change (when new SW takes over)
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('[SW] Controller changed, app may have updated');
-      // Optional: reload page or show notification
+      console.log('[SW] Controller changed, reloading page to apply updates...');
+      window.location.reload();
     });
   });
 }
 
 function promptUpdateReady(newWorker: ServiceWorker) {
   console.log('[SW] New version available');
-  // Optional: Show toast notification to user
-  // "New version available" with "Update" button
-  // On click: newWorker.postMessage({ type: 'SKIP_WAITING' });
+  
+  // Dispatch custom event to notify the React app
+  const event = new CustomEvent('pkr-update-available', {
+    detail: {
+      update: () => {
+        newWorker.postMessage({ type: 'SKIP_WAITING' });
+        // After skipping waiting, the controllerchange event will reload the page
+      }
+    }
+  });
+  window.dispatchEvent(event);
 }
 
 /**
