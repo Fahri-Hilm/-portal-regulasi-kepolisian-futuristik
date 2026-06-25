@@ -1,18 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { IncidentReport, Regulation, ReportType } from '../types';
-import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2 } from 'lucide-react';
+import { Clock, FileText, Trash2, Printer, CheckCircle, AlertTriangle, Car, ShieldAlert, Share2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ReportViewProps {
   reports: IncidentReport[];
   regulations: Regulation[];
   onDeleteReport: (id: string) => void;
+  addToast: (message: string, type?: 'success' | 'warning' | 'error' | 'info' | 'system') => void;
 }
 
 export const ReportView: React.FC<ReportViewProps> = ({
   reports,
   regulations,
   onDeleteReport,
+  addToast,
 }) => {
   const [activeReportTab, setActiveReportTab] = useState<ReportType>('kriminal');
   const [invoiceReport, setInvoiceReport] = useState<IncidentReport | null>(null);
@@ -39,6 +41,43 @@ export const ReportView: React.FC<ReportViewProps> = ({
     new Date(isoStr).toLocaleString('id-ID', {
       year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
     });
+
+  const handleCopyASCII = async (rep: IncidentReport) => {
+    if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(20);
+
+    const articleCodes = rep.articles.map((aid) => {
+      const reg = regulations.find((r) => r.id === aid);
+      return reg ? `• [${reg.code}] ${reg.description}` : `• ${aid}`;
+    }).join('\n');
+
+    const shareText = 
+      `\`\`\`text\n` +
+      `===========================================\n` +
+      `        🚔  LAPORAN TILANG KOTA  🚔        \n` +
+      `===========================================\n` +
+      `ID: ${rep.id.toUpperCase()}\n` +
+      `Waktu: ${formatDate(rep.timestamp)}\n` +
+      `-------------------------------------------\n` +
+      `Pelanggar/Tersangka: ${rep.citizenName}\n` +
+      `Kategori: ${rep.type === 'lalu_lintas' ? 'Lalu Lintas' : 'Kriminal'}\n` +
+      `-------------------------------------------\n` +
+      `Rincian Pasal:\n${articleCodes}\n` +
+      `-------------------------------------------\n` +
+      `Total Denda: ${formatCurrency(rep.totalFine)}\n` +
+      `Kurungan: ${rep.totalJailTime} Bulan\n` +
+      `-------------------------------------------\n` +
+      `     DEPARTEMEN KEPOLISIAN FUTURISTIK      \n` +
+      `===========================================\n` +
+      `\`\`\``;
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      addToast('[📋] LAPORAN FORMAT ASCII DISALIN KE CLIPBOARD', 'success');
+    } catch (err) {
+      console.error('Failed to copy ASCII:', err);
+      alert('Gagal menyalin ke clipboard.');
+    }
+  };
 
   const handleShareInvoice = async (rep: IncidentReport) => {
     if (typeof window !== 'undefined' && navigator.vibrate) navigator.vibrate(20);
@@ -73,7 +112,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
     } else {
       try {
         await navigator.clipboard.writeText(shareText);
-        alert('Teks salinan tilang berhasil disalin ke clipboard!');
+        addToast('[📋] LAPORAN TILANG DISALIN KE CLIPBOARD', 'success');
       } catch (err) {
         console.error('Clipboard fallback failed:', err);
       }
@@ -133,6 +172,13 @@ export const ReportView: React.FC<ReportViewProps> = ({
             <span className="text-slate-500 block">{rep.totalJailTime} Bln</span>
           </div>
           <div className="flex gap-1">
+            <button
+              onClick={() => handleCopyASCII(rep)}
+              className="p-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 rounded transition-colors cursor-pointer"
+              title="Salin Laporan ASCII (Discord)"
+            >
+              <Copy className="w-3 h-3" />
+            </button>
             <button
               onClick={() => setInvoiceReport(rep)}
               className="p-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 hover:border-cyan-500/40 rounded transition-colors cursor-pointer"
@@ -295,6 +341,13 @@ export const ReportView: React.FC<ReportViewProps> = ({
                   >
                     <Printer className="w-3 h-3" />
                     CETAK
+                  </button>
+                  <button
+                    onClick={() => handleCopyASCII(invoiceReport!)}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 rounded cursor-pointer transition-all uppercase text-[9px]"
+                  >
+                    <Copy className="w-3 h-3" />
+                    SALIN ASCII
                   </button>
                   <button
                     onClick={() => handleShareInvoice(invoiceReport!)}

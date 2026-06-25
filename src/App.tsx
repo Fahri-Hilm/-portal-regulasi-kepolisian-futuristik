@@ -581,6 +581,7 @@ function AppContent() {
                       reports={reports}
                       regulations={regulations}
                       onDeleteReport={handleDeleteReport}
+                      addToast={addToast}
                     />
                   )}
 
