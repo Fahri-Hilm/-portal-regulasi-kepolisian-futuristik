@@ -50,15 +50,21 @@ export const ReportView: React.FC<ReportViewProps> = ({
       return reg ? `• [${reg.code}] ${reg.description}` : `• ${aid}`;
     }).join('\n');
 
+    const isTraffic = rep.type === 'lalu_lintas';
+    const headerTitle = isTraffic 
+      ? '        🚔  LAPORAN TILANG KOTA  🚔        ' 
+      : '       🚔  LAPORAN KRIMINAL KOTA  🚔       ';
+    const labelSuspect = isTraffic ? 'Pelanggar' : 'Tersangka';
+
     const shareText = 
       `\`\`\`text\n` +
       `===========================================\n` +
-      `        🚔  LAPORAN TILANG KOTA  🚔        \n` +
+      `${headerTitle}\n` +
       `===========================================\n` +
       `ID: ${rep.id.toUpperCase()}\n` +
       `Waktu: ${formatDate(rep.timestamp)}\n` +
       `-------------------------------------------\n` +
-      `Pelanggar/Tersangka: ${rep.citizenName}\n` +
+      `${labelSuspect}: ${rep.citizenName}\n` +
       `Kategori: ${rep.type === 'lalu_lintas' ? 'Lalu Lintas' : 'Kriminal'}\n` +
       `-------------------------------------------\n` +
       `Rincian Pasal:\n${articleCodes}\n` +
